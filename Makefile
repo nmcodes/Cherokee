@@ -7,7 +7,9 @@
 
 CC 		= 	gcc
 
-SRC 	= 	$(wildcard src/*.c)
+SRC 	= 	src/main.c \
+			src/worker/worker.c \
+			src/utils/process.c
 
 NAME	=	Cherokee
 
@@ -27,9 +29,6 @@ clean:
 
 fclean:		clean
 			rm -f ${NAME}
-
-test:		$(TEST_OBJ)
-			$(CC) $(LDFLAGS) -o $(NAME)_test $(TEST_OBJ)
 
 re:			fclean all
 
