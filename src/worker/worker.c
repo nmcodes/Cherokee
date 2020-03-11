@@ -7,21 +7,47 @@
 */
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <string.h>
 #include "worker.h"
 
 
-void worker(void)
+void worker(int skt)
 {
-    printf("I'm a worker! My PID is %d, my PPID is %d\n", (int) getpid(), (int) getppid());
-    printf("Worker (pid=%d) sleep for 5 sec...\n", (int) getpid());
+    int client_skt;
+    char buf[1024];
 
-    sleep(5);
+    printf("I'm a worker! My PID is %d, my PPID is %d. I received skt : %d\n", (int) getpid(), (int) getppid(), skt);
+
+    while(1) {
+        printf("Worker (pid=%d) start accepting...\n", (int) getpid());
+        client_skt = accept(skt, NULL, NULL);
+        printf("Worker (pid=%d) accepted connection\n", (int) getpid());
+        if (client_skt < 0) {
+            perror("accept failed");
+            break;
+        }
+
+        int read = recv(client_skt, buf, 1024, 0);
+        if (read < 0) {
+            perror("Client read failed\n");
+        }
+        printf("Worker (pid=%d) read %d byte(s)\n", (int) getpid(), read);
+
+        int err = send(client_skt, buf, read, 0);
+        if (err < 0) {
+            perror("Client write failed\n");
+        }
+        printf("Worker (pid=%d) echoed back %d byte(s)\n", (int) getpid(), read);
+        close(client_skt);
+    }
 
     printf("Worker (pid=%d) exiting...\n", (int)getpid());
     exit(0);
 }
 
-pid_t spawn_worker()
+pid_t spawn_worker(int skt)
 {
     pid_t pid = create_process();
 
@@ -31,19 +57,19 @@ pid_t spawn_worker()
         return -1;
     } else if (pid == 0)
     {
-        worker();
+        worker(skt);
     }
 
     return pid;
 }
 
-void spawn_multiple_workers(int nb_workers, pid_t *pids) {
+void spawn_multiple_workers(int nb_workers, pid_t *pids, int skt) {
     int i;
     pid_t pid;
 
     for (i = 0; i < nb_workers; i++)
     {
-        pid = spawn_worker();
+        pid = spawn_worker(skt);
         if (pid == 0) {
             break;
         } else {

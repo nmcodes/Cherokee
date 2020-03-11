@@ -9,17 +9,47 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/socket.h>
+#include <sys/wait.h>
+#include <arpa/inet.h>
 #include "./worker/worker.h"
 
 
 int main(void){
+    int skt;
+    struct sockaddr_in server;
     int nb_workers = 4;
     pid_t *pids = malloc(nb_workers * sizeof(pid_t));
 
     printf("I'm the master, my PID is %d\n", (int) getpid());
+
+    // Creating the socket
+    skt = socket(AF_INET, SOCK_STREAM, 0);
+    if (skt == -1)
+    {
+        perror("socket creation");
+        exit(-1);
+    }
+    printf("Socket created in master process: %d\n", skt);
+
+    // Prepare the sockaddr_in structure
+    server.sin_family = AF_INET;
+    server.sin_addr.s_addr = INADDR_ANY;
+    server.sin_port = htons( 8000 );
+
+    //Bind
+    if(bind(skt, (struct sockaddr *)&server, sizeof(server)) < 0)
+    {
+        perror("bind failed");
+        exit(-1);
+    }
+
+    // start listening on socket
+    listen(skt, 3);
+
     printf("Starting spawning %d workers\n", nb_workers);
 
-    spawn_multiple_workers(nb_workers, pids);
+    spawn_multiple_workers(nb_workers, pids, skt);
 
     printf("Master done spawning workers\n");
 

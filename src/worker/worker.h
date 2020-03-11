@@ -13,7 +13,7 @@
 #include <unistd.h>
 #include "../utils/process.h"
 
-pid_t spawn_worker();
-void spawn_multiple_workers(int nb_workers, pid_t *pids);
+pid_t spawn_worker(int skt);
+void spawn_multiple_workers(int nb_workers, pid_t *pids, int skt);
 
 #endif
