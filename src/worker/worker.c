@@ -10,6 +10,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string.h>
+#include "../parser/parser.h"
 #include "worker.h"
 
 
@@ -26,14 +27,18 @@ void worker(int skt)
         printf("Worker (pid=%d) accepted connection\n", (int) getpid());
         if (client_skt < 0) {
             perror("accept failed");
-            break;
+            printf("[ERROR] Worker (pid = %d) failed to accept connection", (int) getpid());
+            continue;
         }
 
+        memset(buf, '\0', 1024);
         int read = recv(client_skt, buf, 1024, 0);
         if (read < 0) {
             perror("Client read failed\n");
         }
         printf("Worker (pid=%d) read %d byte(s)\n", (int) getpid(), read);
+        printf("GOT REQUEST:\n%s\n", buf);
+        parse(strdup(buf));
 
         int err = send(client_skt, buf, read, 0);
         if (err < 0) {

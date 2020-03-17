@@ -9,7 +9,13 @@ CC 		= 	gcc
 
 SRC 	= 	src/main.c \
 			src/worker/worker.c \
-			src/utils/process.c
+			src/utils/process.c \
+			src/utils/method.c \
+			src/utils/strings.c \
+			src/parser/parser.c \
+			src/request/headers/headers.c \
+			src/request/body.c \
+			src/request/request.c \
 
 NAME	=	Cherokee
 
