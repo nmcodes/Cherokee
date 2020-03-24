@@ -38,10 +38,7 @@ void add_response_header(c_response *res, Http_Header *header) {
     }
 }
 
-Http_Header *find_header(c_request *req, const char *key) {
-    Http_Header *h;
-
-    h = req->headers;
+Http_Header *find_header(Http_Header *h, const char *key) {
     if (h == NULL)
         return NULL;
     while (h->next != NULL && strcmp(h->key, key) != 0) {

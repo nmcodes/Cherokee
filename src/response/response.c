@@ -13,9 +13,12 @@ c_response *new_response() {
 
     response = malloc(sizeof(c_response));
     response->headers = NULL;
-    response->body = NULL;
-    response->body_length = -1;
     response->raw = NULL;
+
+    response->body = malloc(sizeof(c_response_body));
+    response->body->content = NULL;
+    response->body->length = -1;
+    response->body->is_binary = -1;
 
     return response;
 }
@@ -79,8 +82,8 @@ int build_response(c_response *res) {
         h = h->next;
     }
 
-    if (res->body != NULL) {
-        raw_response_length = command_line_length + raw_header_length + 1 + res->body_length;
+    if (res->body->content != NULL) {
+        raw_response_length = command_line_length + raw_header_length + 1 + res->body->length;
     } else {
         raw_response_length = command_line_length + raw_header_length + 1;
     }
@@ -91,18 +94,18 @@ int build_response(c_response *res) {
     strcat(raw_response, raw_headers);
     strcat(raw_response, "\n");
 
-    printf("COPYING BODY AT : %d\n", command_line_length + headers_length + 1);
-    printf("RAW_RESPONSE AT %d: %c\n", command_line_length + headers_length + 1, raw_response[command_line_length + headers_length + 1]);
-    memcpy(raw_response + command_line_length + headers_length + 1, res->body, res->body_length);
-
-    printf("RAW RESPONSE : \n");
-    int i =0;
-    while (i < raw_response_length) {
-        printf("%u ", raw_response[i]);
-        i++;
+    if (res->body->is_binary == CONTENT_TYPE_BINARY) {
+        printf("BINARY CONTENT\n");
+        printf("COPYING BODY AT : %d\n", command_line_length + headers_length + 1);
+        printf("RAW_RESPONSE AT %d: %c\n", command_line_length + headers_length + 1, raw_response[command_line_length + headers_length + 1]);
+        memcpy(raw_response + command_line_length + headers_length + 1, res->body->content, res->body->length);
+    } else {
+        printf("NOT BINARY CONTENT\n");
+        strcat(raw_response, res->body->content);
+        raw_response_length = strlen(raw_response);
     }
-    printf("\n");
 
+    printf("RAW RESPONSE %s\n", raw_response);
     res->raw = raw_response;
     return raw_response_length;
 }
@@ -122,5 +125,5 @@ void log_response(c_response *res) {
     printf("%s=%s\n", header->key, header->value);
 
     if (res->body != NULL)
-      printf("BODY (len=%d): \n%p\n", res->body_length, res->body);
+      printf("BODY (len=%d): \n%p\n", res->body->length, res->body);
 }

@@ -24,12 +24,17 @@ typedef struct      cherokee_Http_Status {
 static const Http_Status STATUS_200_OK = { 200, "OK" };
 static const Http_Status STATUS_404_NOT_FOUND = { 404, "Not Found" };
 
+typedef struct  Cherokee_response_body {
+    void        *content;
+    int         length;
+    int         is_binary;
+}               c_response_body;
+
 typedef struct      cherokee_response {
     Http_Version    version;
     Http_Status     status;
     Http_Header     *headers;
-    void            *body;
-    int             body_length;
+    c_response_body *body;
     char            *raw;
 }                   c_response;
 

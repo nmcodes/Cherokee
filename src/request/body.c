@@ -20,7 +20,7 @@ int append_body(c_request *req, char *data) {
         return 0;
     }
 
-    content_length_header = find_header(req, "content-length");
+    content_length_header = find_header(req->headers, "content-length");
     if (content_length_header == NULL) {
         printf("Error while adding body: Unable to find Content-Length header");
         return -1;
