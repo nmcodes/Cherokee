@@ -95,17 +95,12 @@ int build_response(c_response *res) {
     strcat(raw_response, "\n");
 
     if (res->body->is_binary == CONTENT_TYPE_BINARY) {
-        printf("BINARY CONTENT\n");
-        printf("COPYING BODY AT : %d\n", command_line_length + headers_length + 1);
-        printf("RAW_RESPONSE AT %d: %c\n", command_line_length + headers_length + 1, raw_response[command_line_length + headers_length + 1]);
         memcpy(raw_response + command_line_length + headers_length + 1, res->body->content, res->body->length);
     } else {
-        printf("NOT BINARY CONTENT\n");
         strcat(raw_response, res->body->content);
         raw_response_length = strlen(raw_response);
     }
 
-    printf("RAW RESPONSE %s\n", raw_response);
     res->raw = raw_response;
     return raw_response_length;
 }

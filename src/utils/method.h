@@ -12,5 +12,6 @@
 #include "../headers/headers.h"
 
 Http_Method strToMethod(char *str);
+char *methodToStr(Http_Method m);
 
 #endif

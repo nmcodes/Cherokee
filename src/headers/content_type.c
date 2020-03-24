@@ -97,8 +97,6 @@ Http_Header *new_content_type_header(char *data_type) {
     h->next = NULL;
     h->key = "Content-Type";
     h->value = get_content_type(data_type).value;
-    printf("data type : %s\n", data_type);
-    printf("header value : %s\n", h->value);
 
     return h;
 }

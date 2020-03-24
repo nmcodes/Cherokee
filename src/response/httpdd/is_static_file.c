@@ -27,10 +27,8 @@ int is_static_file(c_config *config, c_request *req) {
     free(file_path);
 
     if(file_exist != -1) {
-        printf("it's a file!\n");
         return HTTPDD_TRUE;
     } else {
-        printf("it's not a file!\n");
         return HTTPDD_FALSE;
     }
 }

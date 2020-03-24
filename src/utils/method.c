@@ -25,3 +25,19 @@ Http_Method strToMethod(char *str) {
     }
     return NONE;
 }
+
+char *methodToStr(Http_Method m) {
+    if (m == GET)
+        return "GET";
+    if (m == POST)
+        return "POST";
+    if (m == PUT)
+        return "PUT";
+    if (m == DELETE)
+        return "DELETE";
+    if (m == OPTIONS)
+        return "OPTIONS";
+    if (m == HEAD)
+        return "HEAD";
+    return "UNKNOWN";
+}

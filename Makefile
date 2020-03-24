@@ -8,6 +8,7 @@
 CC 		= 	gcc
 
 SRC 	= 	src/main.c \
+			src/log/log.c \
 			src/worker/worker.c \
 			src/utils/process.c \
 			src/utils/method.c \

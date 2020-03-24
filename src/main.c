@@ -16,6 +16,7 @@
 
 #include "./worker/worker.h"
 #include "./parser/parser.h"
+#include "./log/log.h"
 
 static volatile int skt;
 
@@ -30,9 +31,10 @@ int main(void){
     int nb_workers = 4;
     pid_t *pids = malloc(nb_workers * sizeof(pid_t));
 
-    printf("I'm the master, my PID is %d\n", (int) getpid());
+    log_set_fp(fopen("access.log", "a+"));
 
     signal(SIGINT, sigint_handler);
+    log_info("Starting Cherokee");
 
     // Creating the socket
     skt = socket(AF_INET, SOCK_STREAM, 0);
@@ -42,12 +44,10 @@ int main(void){
         perror("socket creation");
         exit(-1);
     }
-    printf("Socket created in master process: %d\n", skt);
 
-    // Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(8000);
+    server.sin_port = htons(8001);
 
     //Bind
     if(bind(skt, (struct sockaddr *)&server, sizeof(server)) < 0)
@@ -59,16 +59,11 @@ int main(void){
 
     // start listening on socket
     listen(skt, 3);
-
-    printf("Starting spawning %d workers\n", nb_workers);
-
     spawn_multiple_workers(nb_workers, pids, skt);
-
-    printf("Master done spawning workers\n");
 
     int i;
     for (i = 0; i < nb_workers; i++) {
         waitpid(pids[i], NULL, 0);
     }
-    printf("Master finished.\n");
+    log_info("Closing Cherokee");
 }

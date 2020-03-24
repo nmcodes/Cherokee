@@ -28,10 +28,8 @@ int is_static_directory(c_config *config, c_request *req) {
     free(dir_path);
 
     if (dir_exist == 0 && S_ISDIR(sb.st_mode)) {
-        printf("it's static dir\n");
         return HTTPDD_TRUE;
     } else {
-        printf("it's not static dir\n");
         return HTTPDD_FALSE;
     }
 }

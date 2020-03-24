@@ -14,6 +14,7 @@
 #include "../utils/strings.h"
 #include "../utils/method.h"
 #include "../request/request.h"
+#include "../log/log.h"
 
 c_request *parse(char *data);
 

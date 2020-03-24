@@ -10,6 +10,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <string.h>
+
+#include "../log/log.h"
 #include "../parser/parser.h"
 #include "worker.h"
 
@@ -21,44 +23,45 @@ void worker(int skt)
     c_request *req;
     c_config *config;
 
-    printf("I'm a worker! My PID is %d, my PPID is %d. I received skt : %d\n", (int) getpid(), (int) getppid(), skt);
-
+    log_info("Worker successfuly started.");
     config = new_config();
 
     while(1) {
-        printf("Worker (pid=%d) start accepting...\n", (int) getpid());
+        log_info("Worker ready to accept connection");
         client_skt = accept(skt, NULL, NULL);
-        printf("Worker (pid=%d) accepted connection\n", (int) getpid());
+        log_info("New client connection accepted");
         if (client_skt < 0) {
             perror("accept failed");
-            printf("[ERROR] Worker (pid = %d) failed to accept connection", (int) getpid());
+            log_error("Failed to accept connection");
             exit(1);
         }
 
         memset(buf, '\0', 1024);
         int read = recv(client_skt, buf, 1024, 0);
         if (read < 0) {
+            log_error("Unable to read data");
             perror("Client read failed\n");
         }
 
-        printf("Worker (pid=%d) read %d byte(s)\n", (int) getpid(), read);
-        printf("GOT REQUEST:\n%s\n", buf);
         req = parse(strdup(buf));
+
         resolve_http_decision_diagram(config, req);
-        printf("HTTPDD resolved \n");
-        log_response(req->response);
         int res_len = build_response(req->response);
 
-        printf("Sending response (%d)\n", res_len);
         int err = send(client_skt, req->response->raw, res_len, 0);
         if (err < 0) {
             perror("Client write failed\n");
         }
-        printf("Worker (pid=%d) echoed back %d byte(s)\n", (int) getpid(), res_len);
+
+        if (req->body != NULL) {
+            log_info("HTTP/%d.%d %s %s (%d) Sent %d bytes (%d)", req->version.major, req->version.minor, methodToStr(req->method), req->url, strlen(req->body), req->response->status.code);
+        } else {
+            log_info("HTTP/%d.%d %s %s (%d)", req->version.major, req->version.minor, methodToStr(req->method), req->url, req->response->status.code);
+        }
         close(client_skt);
     }
 
-    printf("Worker (pid=%d) exiting...\n", (int)getpid());
+    log_error("Worker exiting");
     exit(0);
 }
 
@@ -81,6 +84,8 @@ pid_t spawn_worker(int skt)
 void spawn_multiple_workers(int nb_workers, pid_t *pids, int skt) {
     int i;
     pid_t pid;
+
+    log_info("Spawning %d workers", nb_workers);
 
     for (i = 0; i < nb_workers; i++)
     {

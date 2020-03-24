@@ -37,13 +37,5 @@ void *read_file(const char *file_path, int *size) {
     fread(buf, *size, 1, fd); //read into buffer
     fclose(fd);
 
-    printf("READ DATA FROM FILE : \n");
-    int i =0;
-    while (i < *size) {
-        printf("%u ", buf[i]);
-        i++;
-    }
-    printf("\n");
-
     return buf;
 }

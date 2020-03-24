@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
+
 #include "parser.h"
 
 Http_Version parse_version(char *str) {
@@ -71,7 +72,7 @@ int parse_header(c_request *req, char *raw_header) {
     parsed_header->key = key;
 
     if (parsed_header->key == NULL) {
-        printf("Error while parsing %s\n", raw_header);
+        log_error("Error while parsing %s\n", raw_header);
         return -1;
     }
 
@@ -104,25 +105,27 @@ c_request *parse(char *raw_request) {
 
     // CREATING THE REQUEST
     req = new_request();
+
     // SEPARATING HEADERS FROM BODY
     // GET BODY
     raw_body = strstr(raw_request, delim);
     raw_body[0] = '\0';
     raw_body = raw_body + strlen(delim);
+
     // GET HEADERS
     raw_headers = raw_request;
+
     // PARSING THEM AND ADD THEM TO THE REQUEST
     if (parse_headers(req, raw_headers) < 0) {
-        printf("ERROR: Unable to parse headers\n");
+        log_error("Unable to parse headers");
         return NULL;
     }
+
     // ADDING THE BODY TO THE CONTENT
     if (strlen(raw_body) > 0) {
         append_body(req, raw_body);
     } else {
         req->is_complete = 1;
     }
-    // DEBUG
-    log_request(req);
     return req;
 }

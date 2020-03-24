@@ -17,6 +17,5 @@ Http_Header *new_content_length_header(int length) {
     h->key = "Content-Length";
     sprintf(h->value, "%d", length);
 
-    printf("Content-Length header builded : %s: %s\n", h->key, h->value);
     return h;
 }

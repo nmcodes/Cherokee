@@ -53,3 +53,6 @@ dkms.conf
 
 # bin
 Cherokee
+
+# log files
+access.log
