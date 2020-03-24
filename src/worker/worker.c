@@ -18,8 +18,12 @@ void worker(int skt)
 {
     int client_skt;
     char buf[1024];
+    c_request *req;
+    c_config *config;
 
     printf("I'm a worker! My PID is %d, my PPID is %d. I received skt : %d\n", (int) getpid(), (int) getppid(), skt);
+
+    config = new_config();
 
     while(1) {
         printf("Worker (pid=%d) start accepting...\n", (int) getpid());
@@ -28,7 +32,7 @@ void worker(int skt)
         if (client_skt < 0) {
             perror("accept failed");
             printf("[ERROR] Worker (pid = %d) failed to accept connection", (int) getpid());
-            continue;
+            exit(1);
         }
 
         memset(buf, '\0', 1024);
@@ -36,15 +40,21 @@ void worker(int skt)
         if (read < 0) {
             perror("Client read failed\n");
         }
+
         printf("Worker (pid=%d) read %d byte(s)\n", (int) getpid(), read);
         printf("GOT REQUEST:\n%s\n", buf);
-        parse(strdup(buf));
+        req = parse(strdup(buf));
+        resolve_http_decision_diagram(config, req);
+        printf("HTTPDD resolved \n");
+        log_response(req->response);
+        int res_len = build_response(req->response);
 
-        int err = send(client_skt, buf, read, 0);
+        printf("Sending response (%d)\n", res_len);
+        int err = send(client_skt, req->response->raw, res_len, 0);
         if (err < 0) {
             perror("Client write failed\n");
         }
-        printf("Worker (pid=%d) echoed back %d byte(s)\n", (int) getpid(), read);
+        printf("Worker (pid=%d) echoed back %d byte(s)\n", (int) getpid(), res_len);
         close(client_skt);
     }
 

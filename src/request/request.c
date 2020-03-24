@@ -17,6 +17,8 @@ c_request *new_request() {
     req = malloc(sizeof(c_request));
     req->is_complete = 0;
     req->body = NULL;
+    req->url = NULL;
+    req->response = new_response();
 
     return req;
 }

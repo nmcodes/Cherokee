@@ -12,22 +12,33 @@
 #include <sys/socket.h>
 #include <sys/wait.h>
 #include <arpa/inet.h>
+#include <signal.h>
+
 #include "./worker/worker.h"
 #include "./parser/parser.h"
 
+static volatile int skt;
+
+void sigint_handler(int dummy) {
+    printf("dummy : %d\n", dummy);
+
+    close(skt);
+}
 
 int main(void){
-    int skt;
     struct sockaddr_in server;
     int nb_workers = 4;
     pid_t *pids = malloc(nb_workers * sizeof(pid_t));
 
     printf("I'm the master, my PID is %d\n", (int) getpid());
 
+    signal(SIGINT, sigint_handler);
+
     // Creating the socket
     skt = socket(AF_INET, SOCK_STREAM, 0);
     if (skt == -1)
     {
+        close(skt);
         perror("socket creation");
         exit(-1);
     }
@@ -36,12 +47,13 @@ int main(void){
     // Prepare the sockaddr_in structure
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(8000);
+    server.sin_port = htons(8001);
 
     //Bind
     if(bind(skt, (struct sockaddr *)&server, sizeof(server)) < 0)
     {
         perror("bind failed");
+        close(skt);
         exit(-1);
     }
 

@@ -9,7 +9,7 @@
 #ifndef __METHOD_H__
 #define __METHOD_H__
 
-#include "../request/headers/headers.h"
+#include "../headers/headers.h"
 
 Http_Method strToMethod(char *str);
 

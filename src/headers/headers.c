@@ -10,13 +10,27 @@
 #include <stdlib.h>
 #include <string.h>
 
-void add_header(c_request *req, Http_Header *header) {
+void add_request_header(c_request *req, Http_Header *header) {
     Http_Header *last_header;
 
     if (req->headers == NULL) {
         req->headers = header;
     } else {
         last_header = req->headers;
+        while (last_header->next != NULL) {
+            last_header = last_header->next;
+        }
+        last_header->next = header;
+    }
+}
+
+void add_response_header(c_response *res, Http_Header *header) {
+    Http_Header *last_header;
+
+    if (res->headers == NULL) {
+        res->headers = header;
+    } else {
+        last_header = res->headers;
         while (last_header->next != NULL) {
             last_header = last_header->next;
         }

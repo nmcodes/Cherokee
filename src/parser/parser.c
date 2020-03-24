@@ -49,6 +49,7 @@ int parse_command(c_request *request, char *raw_cmd) {
         return -1;
     }
     request->version = version;
+    request->response->version = version;
 
     return 0;
 }
@@ -74,7 +75,7 @@ int parse_header(c_request *req, char *raw_header) {
         return -1;
     }
 
-    add_header(req, parsed_header);
+    add_request_header(req, parsed_header);
     return 0;
 }
 
