@@ -37,6 +37,10 @@ void free_response(c_response *res) {
             free(res->body->content);
         free(res->body);
     }
+    if (res->headers != NULL)
+        free_headers(res->headers);
+    if (res->raw != NULL)
+        free(res->raw);
     free(res);
 }
 
@@ -58,8 +62,9 @@ int get_command_line_length(c_response *res) {
     ** 1 = space
     ** strlen(res->status.hint) : hint length
     ** 1 = \n
+    ** 1 = \0
     */
-    return 8 + 1 + 3 + 1 + strlen(res->status.hint) + 1;
+    return 8 + 1 + 3 + 1 + strlen(res->status.hint) + 1 + 1;
 }
 
 int get_headers_length(c_response *res) {
@@ -72,7 +77,7 @@ int get_headers_length(c_response *res) {
         headers_length += (int) strlen(h->key) + 2 + (int) strlen(h->value) + 1;
         h = h->next;
     }
-    return headers_length;
+    return headers_length + 1;
 }
 
 int build_command_line(c_response *res, char **raw_command_line) {
@@ -80,6 +85,7 @@ int build_command_line(c_response *res, char **raw_command_line) {
 
     command_line_length = get_command_line_length(res);
     *raw_command_line = malloc(command_line_length);
+    memset(*raw_command_line, '\0', command_line_length);
     sprintf(*raw_command_line, "HTTP/%d.%d %d %s\n", res->version.major, res->version.minor, res->status.code, res->status.hint);
 
     return command_line_length;
@@ -97,11 +103,14 @@ int build_headers(c_response *res, char **raw_headers){
 
     h = res->headers;
     while (h != NULL) {
-        raw_header_length = (int) strlen(h->key) + 2 + (int) strlen(h->value) + 1;
+        raw_header_length = (int) strlen(h->key) + 2 + (int) strlen(h->value) + 2;
         raw_header = malloc(raw_header_length);
+        memset(raw_header, '\0', raw_header_length);
         sprintf(raw_header, "%s: %s\n", h->key, h->value);
         strcat(*raw_headers, raw_header);
+
         h = h->next;
+        free(raw_header);
     }
 
     return headers_length;
@@ -165,10 +174,12 @@ int build_response(c_response *res) {
     log_debug("ADD BODY TO RESPONSE");
     int l = add_body_to_response(res, command_line_length, headers_length);
     log_debug("L : %d", l);
+    // free(raw_command_line);
+    // free(raw_headers);
+
     if (l != -1) {
         return l;
     }
-
     return raw_response_length;
 }
 

@@ -43,7 +43,7 @@ void worker(int skt)
             perror("Client read failed\n");
         }
 
-        req = parse(strdup(buf));
+        req = parse(buf);
 
         resolve_http_decision_diagram(config, req);
         log_debug("BUILD RESPONSE");

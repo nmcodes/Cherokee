@@ -29,6 +29,10 @@ void free_request(c_request *req) {
         return;
     if (req->body != NULL)
         free(req->body);
+    if (req->headers != NULL) {
+        printf("FREEING REQUEST HEADERS");
+        free_headers(req->headers);
+    }
 
     //free_response(req->response);
     free(req);

@@ -12,7 +12,8 @@
 char *get_file_path(char *root_path, char *url) {
     char *file_path;
 
-    file_path = malloc(strlen(root_path) + strlen(url) + 1);
+    file_path = malloc(strlen(root_path) + strlen(url) + 2);
+    memset(file_path, '\0', strlen(root_path) + strlen(url) + 2);
     strcat(file_path, root_path);
     strcat(file_path, url);
 
@@ -33,7 +34,8 @@ void *read_file(const char *file_path, int *size) {
     fseek(fd, 0, SEEK_END); //go to end
     *size = ftell(fd); //get position at end (length)
     fseek(fd, 0, SEEK_SET); //go to beg.
-    buf = (char *)malloc(*size); //malloc buffer
+    buf = (char *)malloc(*size + 1); //malloc buffer
+    memset(buf, '\0', *size + 1);
     fread(buf, *size, 1, fd); //read into buffer
     fclose(fd);
 

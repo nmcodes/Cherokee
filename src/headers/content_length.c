@@ -14,7 +14,7 @@ Http_Header *new_content_length_header(int length) {
     h = malloc(sizeof(Http_Header));
     h->next = NULL;
     h->value = malloc(10);
-    h->key = "Content-Length";
+    h->key = strdup("Content-Length");
     sprintf(h->value, "%d", length);
 
     return h;
