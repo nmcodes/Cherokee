@@ -28,7 +28,7 @@ void sigint_handler(int dummy) {
 
 int main(void){
     struct sockaddr_in server;
-    int nb_workers = 4;
+    int nb_workers = 1;
     pid_t *pids = malloc(nb_workers * sizeof(pid_t));
 
     log_set_fp(fopen("access.log", "a+"));
@@ -66,5 +66,7 @@ int main(void){
     for (i = 0; i < nb_workers; i++) {
         waitpid(pids[i], NULL, 0);
     }
+
+    free(pids);
     log_info("Closing Cherokee");
 }

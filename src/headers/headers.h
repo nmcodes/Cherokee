@@ -34,6 +34,8 @@ typedef struct          c_Content_type {
 #include "../request/request.h"
 #include "../response/response.h"
 
+void free_headers(Http_Header *headers);
+
 void add_request_header(c_request *req, Http_Header *header);
 void add_response_header(c_response *res, Http_Header *header);
 Http_Header *find_header(Http_Header *h, const char *key);

@@ -95,7 +95,7 @@ Http_Header *new_content_type_header(char *data_type) {
 
     h = malloc(sizeof(Http_Header));
     h->next = NULL;
-    h->key = "Content-Type";
+    h->key = strdup("Content-Type");
     h->value = get_content_type(data_type).value;
 
     return h;

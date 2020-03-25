@@ -14,7 +14,7 @@ Http_Header *new_server_header() {
 
     h = malloc(sizeof(Http_Header));
     h->next = NULL;
-    h->key = "Server";
-    h->value = "myCherokee";
+    h->key = strdup("Server");
+    h->value = strdup("myCherokee");
     return h;
 }
