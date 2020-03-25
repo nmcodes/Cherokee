@@ -25,7 +25,12 @@ c_request *new_request() {
 
 
 void free_request(c_request *req) {
-    free(req->body);
+    if (req == NULL)
+        return;
+    if (req->body != NULL)
+        free(req->body);
+
+    free_response(req->response);
     free(req);
 }
 

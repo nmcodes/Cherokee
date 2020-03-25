@@ -40,6 +40,8 @@ typedef struct      cherokee_response {
 
 void log_response(c_response *res);
 int build_response(c_response *res);
+
 c_response *new_response();
+void free_response(c_response *res);
 
 #endif

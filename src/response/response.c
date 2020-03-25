@@ -7,6 +7,7 @@
 */
 
 #include "response.h"
+#include "../log/log.h"
 
 c_response *new_response() {
     c_response *response;
@@ -21,6 +22,17 @@ c_response *new_response() {
     response->body->is_binary = -1;
 
     return response;
+}
+
+void free_response(c_response *res) {
+    if (res == NULL)
+        return;
+    if (res->body != NULL) {
+        if (res->body->content != NULL)
+            free(res->body->content);
+        free(res->body);
+    }
+    free(res);
 }
 
 void finish_response(c_response *response) {
@@ -58,50 +70,90 @@ int get_headers_length(c_response *res) {
     return headers_length;
 }
 
-int build_response(c_response *res) {
-    Http_Header *h;
-    char *raw_command_line, *raw_headers, *raw_header, *raw_response;
-    int command_line_length, headers_length, raw_header_length, raw_response_length;
-
-    finish_response(res);
+int build_command_line(c_response *res, char **raw_command_line) {
+    int command_line_length;
 
     command_line_length = get_command_line_length(res);
-    raw_command_line = malloc(command_line_length);
-    sprintf(raw_command_line, "HTTP/%d.%d %d %s\n", res->version.major, res->version.minor, res->status.code, res->status.hint);
+    *raw_command_line = malloc(command_line_length);
+    sprintf(*raw_command_line, "HTTP/%d.%d %d %s\n", res->version.major, res->version.minor, res->status.code, res->status.hint);
+
+    return command_line_length;
+}
+
+int build_headers(c_response *res, char **raw_headers){
+    Http_Header *h;
+    int headers_length;
+    int raw_header_length;
+    char *raw_header;
 
     headers_length = get_headers_length(res);
-    raw_headers = malloc(headers_length);
-    memset(raw_headers, '\0', headers_length);
+    *raw_headers = malloc(headers_length);
+    memset(*raw_headers, '\0', headers_length);
 
     h = res->headers;
     while (h != NULL) {
         raw_header_length = (int) strlen(h->key) + 2 + (int) strlen(h->value) + 1;
         raw_header = malloc(raw_header_length);
         sprintf(raw_header, "%s: %s\n", h->key, h->value);
-        strcat(raw_headers, raw_header);
+        strcat(*raw_headers, raw_header);
         h = h->next;
     }
 
-    if (res->body->content != NULL) {
-        raw_response_length = command_line_length + raw_header_length + 1 + res->body->length;
-    } else {
-        raw_response_length = command_line_length + raw_header_length + 1;
-    }
-    raw_response = malloc(raw_response_length);
-    memset(raw_response, '\0', raw_response_length);
+    return headers_length;
+}
 
-    strcat(raw_response, raw_command_line);
-    strcat(raw_response, raw_headers);
-    strcat(raw_response, "\n");
+int get_response_length(c_response *res, int cmd_line_length, int headers_length) {
+    if (res == NULL || res->body == NULL)
+        return 0;
+
+    if (res->body->content != NULL) {
+        return cmd_line_length + headers_length + 1 + res->body->length;
+    }
+    return cmd_line_length + headers_length + 1;
+}
+
+int add_body_to_response(c_response *res, int cmd_line_length, int headers_length) {
+    if (res == NULL || res->body == NULL || res->body->content == NULL || res->raw == NULL)
+        return 0;
 
     if (res->body->is_binary == CONTENT_TYPE_BINARY) {
-        memcpy(raw_response + command_line_length + headers_length + 1, res->body->content, res->body->length);
+        memcpy(
+            res->raw + cmd_line_length + headers_length + 1,
+            res->body->content,
+            res->body->length
+        );
+        return -1;
     } else {
-        strcat(raw_response, res->body->content);
-        raw_response_length = strlen(raw_response);
+        strcat(res->raw, res->body->content);
+        return strlen(res->raw);
+    }
+}
+
+int build_response(c_response *res) {
+    char *raw_command_line;
+    char *raw_headers;
+    int command_line_length;
+    int headers_length;
+    int raw_response_length;
+
+    finish_response(res);
+
+    command_line_length = build_command_line(res, &raw_command_line);
+    headers_length = build_headers(res, &raw_headers);
+
+    raw_response_length = get_response_length(res, command_line_length, headers_length);
+    res->raw = malloc(raw_response_length);
+    memset(res->raw, '\0', raw_response_length);
+
+    strcat(res->raw, raw_command_line);
+    strcat(res->raw, raw_headers);
+    strcat(res->raw, "\n");
+
+    int l = add_body_to_response(res, command_line_length, headers_length);
+    if (l != -1) {
+        return l;
     }
 
-    res->raw = raw_response;
     return raw_response_length;
 }
 

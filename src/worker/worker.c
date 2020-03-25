@@ -58,6 +58,8 @@ void worker(int skt)
         } else {
             log_info("HTTP/%d.%d %s %s (%d)", req->version.major, req->version.minor, methodToStr(req->method), req->url, req->response->status.code);
         }
+
+        free_request(req);
         close(client_skt);
     }
 

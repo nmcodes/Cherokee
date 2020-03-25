@@ -32,6 +32,7 @@ int main(void){
     pid_t *pids = malloc(nb_workers * sizeof(pid_t));
 
     log_set_fp(fopen("access.log", "a+"));
+    log_set_level(0);
 
     signal(SIGINT, sigint_handler);
     log_info("Starting Cherokee");
@@ -47,7 +48,7 @@ int main(void){
 
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(8001);
+    server.sin_port = htons(8000);
 
     //Bind
     if(bind(skt, (struct sockaddr *)&server, sizeof(server)) < 0)

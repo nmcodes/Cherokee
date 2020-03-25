@@ -35,7 +35,7 @@ NAME	=	Cherokee
 
 OBJ		=	$(SRC:.c=.o)
 
-CFLAGS	+=	-W -Wall -Werror
+CFLAGS	+=	-W -Wall -Werror -g3
 
 LDFLAGS	=
 
