@@ -25,6 +25,7 @@ void worker(int skt)
 
     log_info("Worker successfuly started.");
     config = new_config();
+    test_config();
 
     while(1) {
         log_info("Worker ready to accept connection");

@@ -10,11 +10,19 @@
 #define __CONFIG_H__
 
 #include <stdlib.h>
+#include <stdio.h>
+#include <string.h>
 
-typedef struct  cherokee_config {
-    char        *root_path;
-}               c_config;
+typedef struct cherokee_config
+{
+    int port;
+    const char* loglevel;
+    const char* logfile;
+    const char* rootpath; 
+} c_config;
 
 c_config *new_config();
+int      test_config();
+
 
 #endif

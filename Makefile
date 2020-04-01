@@ -23,6 +23,7 @@ SRC 	= 	src/main.c \
 			src/request/body.c \
 			src/request/request.c \
 			src/config/config.c \
+			src/inih/ini.c \
 			src/response/response.c \
 			src/response/content/serve_static_file.c \
 			src/response/content/not_found.c \
