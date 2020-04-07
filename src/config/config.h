@@ -15,14 +15,18 @@
 
 typedef struct cherokee_config
 {
-    int port;
-    const char* loglevel;
-    const char* logfile;
-    const char* rootpath; 
+    int     port;
+    char*   loglevel;
+    char*   logfile;
+    char*   root_path;
+    int     workers;
+    int     headermaxsize;
+    int     backlog; 
 } c_config;
 
 c_config *new_config();
 int      test_config();
+void     default_config(c_config* pconfig);
 
 
 #endif

@@ -28,7 +28,9 @@ int main(void){
     struct sockaddr_in server;
     // int nb_workers = 4;
     // pid_t *pids = malloc(nb_workers * sizeof(pid_t));
+    c_config *config;
 
+    config = new_config();
     log_set_fp(fopen("access.log", "a+"));
     log_set_level(0);
 
@@ -68,9 +70,9 @@ int main(void){
     }
 
     // start listening on socket
-    listen(skt, 3);
+    listen(skt, config->backlog);
     worker(skt);
-    // spawn_multiple_workers(nb_workers, pids, skt);
+    // spawn_multiple_workers(pids, skt, config);
 
     // int i;
     // for (i = 0; i < nb_workers; i++) {
