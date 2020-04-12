@@ -6,9 +6,7 @@
 **
 */
 
-#include <stdio.h>
-#include <stdlib.h>
- 
+#include "lru11.h"
 
 typedef struct QNode
 {
