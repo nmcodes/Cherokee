@@ -1,3 +1,11 @@
+/*
+** lru11.c for Cherokee
+**
+** Made by NGALULA Jean-Paul
+** Login   <ngalul_j@etna-alternance.net>
+**
+*/
+
 #include <stdio.h>
 #include <stdlib.h>
  
@@ -137,7 +145,6 @@ void ReferencePage( Queue* queue, Hash* hash, unsigned pageNumber )
 
 int main()
 {
-   
     Queue* q = createQueue( 4 );        
     Hash* hash = createHash( 10 );
     ReferencePage( q, hash, 1);
