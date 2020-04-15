@@ -64,7 +64,7 @@ void call_python_module(c_response *res, char *folder, char *method) {
             }
 
             pBody = PyDict_GetItemString(pValue, "body");
-            res->body->content = PyUnicode_AsUTF8(pBody);
+            res->body->content = strdup(PyUnicode_AsUTF8(pBody));
             res->body->length = (int) strlen(res->body->content);
             res->body->is_binary = 0;
             Py_DECREF(pValue);

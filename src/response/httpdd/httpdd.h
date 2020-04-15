@@ -33,6 +33,11 @@ void resolve_http_decision_diagram(c_config *config, c_request *request);
 int is_static_file(c_config *config, c_request *req);
 int is_static_location(c_config *config, c_request *req);
 int is_static_directory(c_config *config, c_request *req);
+
 int is_get_method(c_config *config, c_request *req);
+int is_get_or_head_method(c_config *config, c_request *req);
+int is_post_method(c_config *config, c_request *req);
+int is_put_method(c_config *config, c_request *req);
+int is_delete_method(c_config *config, c_request *req);
 
 #endif

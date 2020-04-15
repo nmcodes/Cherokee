@@ -10,7 +10,7 @@
 
 c_http_decision_diagram d_serve_static_file = { serve_static_file, NULL, NULL };
 c_http_decision_diagram d_not_found = { not_found, NULL, NULL };
-c_http_decision_diagram d_static_file_is_get = { is_get_method, &d_serve_static_file, NULL };
+c_http_decision_diagram d_static_file_is_get = { is_get_or_head_method, &d_serve_static_file, NULL };
 c_http_decision_diagram d_static_file = { is_static_file, &d_static_file_is_get, &d_not_found };
 
 c_http_decision_diagram d_static_dir = { is_static_directory, NULL, &d_static_file };

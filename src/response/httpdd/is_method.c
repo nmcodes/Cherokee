@@ -19,6 +19,10 @@ int is_get_method(__attribute__((unused)) c_config *config, c_request *req) {
     return is_method(req, GET);
 }
 
+int is_get_or_head_method(__attribute__((unused)) c_config *config, c_request *req) {
+    return is_method(req, GET) || is_method(req, HEAD);
+}
+
 int is_post_method(__attribute__((unused)) c_config *config, c_request *req) {
     return is_method(req, POST);
 }
