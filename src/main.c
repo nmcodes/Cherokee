@@ -20,16 +20,14 @@
 
 static volatile int skt;
 
-void sigint_handler(int dummy) {
-    printf("dummy : %d\n", dummy);
-
+void sigint_handler(__attribute__((unused)) int dummy) {
     close(skt);
 }
 
 int main(void){
     struct sockaddr_in server;
-    int nb_workers = 4;
-    pid_t *pids = malloc(nb_workers * sizeof(pid_t));
+    // int nb_workers = 4;
+    // pid_t *pids = malloc(nb_workers * sizeof(pid_t));
 
     log_set_fp(fopen("access.log", "a+"));
     log_set_level(0);
@@ -42,9 +40,20 @@ int main(void){
     if (skt == -1)
     {
         close(skt);
-        perror("socket creation");
+        log_error("socket creation");
         exit(-1);
     }
+    int reuse = 1;
+    if (setsockopt(skt, SOL_SOCKET, SO_REUSEADDR, (const char*)&reuse, sizeof(reuse)) < 0) {
+        log_error("setsockopt(SO_REUSEADDR) failed");
+        exit(-1);
+    }
+
+    if (setsockopt(skt, SOL_SOCKET, SO_REUSEPORT, (const char*)&reuse, sizeof(reuse)) < 0)  {
+        log_error("setsockopt(SO_REUSEPORT) failed");
+        exit(-1);
+    }
+
 
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
@@ -60,11 +69,12 @@ int main(void){
 
     // start listening on socket
     listen(skt, 3);
-    spawn_multiple_workers(nb_workers, pids, skt);
+    worker(skt);
+    // spawn_multiple_workers(nb_workers, pids, skt);
 
-    int i;
-    for (i = 0; i < nb_workers; i++) {
-        waitpid(pids[i], NULL, 0);
-    }
+    // int i;
+    // for (i = 0; i < nb_workers; i++) {
+    //     waitpid(pids[i], NULL, 0);
+    // }
     log_info("Closing Cherokee");
 }

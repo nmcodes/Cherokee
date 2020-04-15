@@ -25,6 +25,7 @@ SRC 	= 	src/main.c \
 			src/config/config.c \
 			src/response/response.c \
 			src/response/content/serve_static_file.c \
+			src/response/content/not_found.c \
 			src/response/httpdd/httpdd.c \
 			src/response/httpdd/is_static_file.c \
 			src/response/httpdd/is_static_directory.c \

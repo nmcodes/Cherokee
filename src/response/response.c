@@ -21,6 +21,11 @@ c_response *new_response() {
     response->body->length = -1;
     response->body->is_binary = -1;
 
+    Http_Status s;
+    s.code = 500;
+    s.hint = "Internal Server Error";
+    response->status = s;
+
     return response;
 }
 
@@ -113,10 +118,13 @@ int get_response_length(c_response *res, int cmd_line_length, int headers_length
 }
 
 int add_body_to_response(c_response *res, int cmd_line_length, int headers_length) {
-    if (res == NULL || res->body == NULL || res->body->content == NULL || res->raw == NULL)
+    if (res == NULL || res->body == NULL || res->body->content == NULL || res->raw == NULL) {
+        log_debug("NO CONTENT");
         return 0;
+    }
 
     if (res->body->is_binary == CONTENT_TYPE_BINARY) {
+        log_debug("BINARY CONTENT");
         memcpy(
             res->raw + cmd_line_length + headers_length + 1,
             res->body->content,
@@ -124,8 +132,13 @@ int add_body_to_response(c_response *res, int cmd_line_length, int headers_lengt
         );
         return -1;
     } else {
+        log_debug("NOT BINARY CONTENT");
+        log_debug("res->raw : %s", res->raw);
+        log_debug("res->body->content : %s", res->body->content);
         strcat(res->raw, res->body->content);
-        return strlen(res->raw);
+        log_debug("res->raw : %s", res->raw);
+        log_debug("strlen(res->raw) : %d", strlen(res->raw));
+        return (int) strlen(res->raw);
     }
 }
 
@@ -149,7 +162,9 @@ int build_response(c_response *res) {
     strcat(res->raw, raw_headers);
     strcat(res->raw, "\n");
 
+    log_debug("ADD BODY TO RESPONSE");
     int l = add_body_to_response(res, command_line_length, headers_length);
+    log_debug("L : %d", l);
     if (l != -1) {
         return l;
     }

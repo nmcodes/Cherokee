@@ -46,17 +46,19 @@ void worker(int skt)
         req = parse(strdup(buf));
 
         resolve_http_decision_diagram(config, req);
+        log_debug("BUILD RESPONSE");
         int res_len = build_response(req->response);
+        log_debug("BUILD RESPONSE DONE");
 
         int err = send(client_skt, req->response->raw, res_len, 0);
         if (err < 0) {
-            perror("Client write failed\n");
-        }
-
-        if (req->body != NULL) {
-            log_info("HTTP/%d.%d %s %s (%d) Sent %d bytes (%d)", req->version.major, req->version.minor, methodToStr(req->method), req->url, strlen(req->body), req->response->status.code);
+            log_error("Client write failed");
         } else {
-            log_info("HTTP/%d.%d %s %s (%d)", req->version.major, req->version.minor, methodToStr(req->method), req->url, req->response->status.code);
+            if (req->body != NULL) {
+                log_info("HTTP/%d.%d %s %s (%d) Sent %d bytes (%d)", req->version.major, req->version.minor, methodToStr(req->method), req->url, strlen(req->body), req->response->status.code);
+            } else {
+                log_info("HTTP/%d.%d %s %s (%d)", req->version.major, req->version.minor, methodToStr(req->method), req->url, req->response->status.code);
+            }
         }
 
         free_request(req);

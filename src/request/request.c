@@ -30,7 +30,7 @@ void free_request(c_request *req) {
     if (req->body != NULL)
         free(req->body);
 
-    free_response(req->response);
+    //free_response(req->response);
     free(req);
 }
 
