@@ -7,6 +7,12 @@
 
 CC 		= 	gcc
 
+LDLIBS  =   -lpython3.6
+
+CFLAGS  =    -g -I/usr/include/python3.6m -L/usr/include/python3.6m
+
+PLIB:=$(shell /usr/bin/python3-config --ldflags) #--cflags
+
 SRC 	= 	src/main.c \
 			src/log/log.c \
 			src/worker/worker.c \
@@ -32,19 +38,17 @@ SRC 	= 	src/main.c \
 			src/response/httpdd/is_static_directory.c \
 			src/response/httpdd/is_static_location.c \
 			src/response/httpdd/is_get_method.c \
+			src/custom/custom.c \
+			src/custom/call.c \
 
 NAME	=	Cherokee
 
 OBJ		=	$(SRC:.c=.o)
 
-CFLAGS	+=	-W -Wall -Werror -g3
-
-LDFLAGS	=
-
 all: 		$(NAME)
 
 $(NAME):	$(OBJ)
-			$(CC) -o $(NAME) $(OBJ) $(LDFLAGS)
+			$(CC) -o $(NAME) $(OBJ) $(PLIB)
 
 clean:
 			rm -f $(OBJ)

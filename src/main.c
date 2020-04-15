@@ -17,10 +17,12 @@
 #include "./worker/worker.h"
 #include "./parser/parser.h"
 #include "./log/log.h"
+#include "./config/config.h"
+#include "./custom/custom.h"
 
 static volatile int skt;
 
-void sigint_handler(__attribute__((unused)) int dummy) {
+void sigint_handler(__attribute__((unused)) int i) {
     close(skt);
 }
 
@@ -33,6 +35,9 @@ int main(void){
     config = new_config();
     log_set_fp(fopen("access.log", "a+"));
     log_set_level(0);
+
+    config->router = get_custom_router(config);
+    call_python_module("/tmp/cherokee-custom/users", "get");
 
     signal(SIGINT, sigint_handler);
     log_info("Starting Cherokee");

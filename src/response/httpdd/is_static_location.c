@@ -7,9 +7,18 @@
 */
 
 #include "./httpdd.h"
+#include "../../log/log.h"
 
 int is_static_location(c_config *config, c_request *req) {
-    config = config;
-    req = req;
+    c_router *r;
+
+    if (req->url == NULL) {
+        return HTTPDD_TRUE;
+    }
+
+    r = get_router_from_url(req->url);
+    if (r != NULL) {
+        return HTTPDD_FALSE
+    }
     return HTTPDD_TRUE;
 }
