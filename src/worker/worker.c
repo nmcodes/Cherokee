@@ -41,6 +41,7 @@ void worker(int skt, c_config* config)
             log_error("Unable to read data");
             perror("Client read failed\n");
         }
+        log_debug("GOT REQUEST:\n%s", buf);
 
         req = parse(buf);
 
@@ -60,7 +61,7 @@ void worker(int skt, c_config* config)
             }
         }
 
-        free_request(req);
+        // free_request(req);
         close(client_skt);
     }
 

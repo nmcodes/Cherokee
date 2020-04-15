@@ -74,6 +74,8 @@ int get_headers_length(c_response *res) {
     headers_length = 0;
     h = res->headers;
     while (h != NULL) {
+        log_debug("GET HEADERS LENGTH FOR H->key: %s", h->key);
+        log_debug("GET HEADERS LENGTH FOR H->value: %s", h->value);
         headers_length += (int) strlen(h->key) + 2 + (int) strlen(h->value) + 1;
         h = h->next;
     }
@@ -132,10 +134,12 @@ int add_body_to_response(c_response *res, int cmd_line_length, int headers_lengt
         return 0;
     }
 
+    log_debug("ADD BODY TO RESPONSE, CONTENT : %p", res->body->content);
+    log_debug("CONTENT FROM FILE : %x", res->body->content);
     if (res->body->is_binary == CONTENT_TYPE_BINARY) {
         log_debug("BINARY CONTENT");
         memcpy(
-            res->raw + cmd_line_length + headers_length + 1,
+            res->raw + cmd_line_length + headers_length - 1,
             res->body->content,
             res->body->length
         );
