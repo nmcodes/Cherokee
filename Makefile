@@ -24,6 +24,7 @@ SRC 	= 	src/main.c \
 			src/request/request.c \
 			src/config/config.c \
 			src/inih/ini.c \
+			src/threadpool/thpool.c \
 			src/response/response.c \
 			src/response/content/serve_static_file.c \
 			src/response/content/not_found.c \
@@ -44,7 +45,7 @@ LDFLAGS	=
 all: 		$(NAME)
 
 $(NAME):	$(OBJ)
-			$(CC) -o $(NAME) $(OBJ) $(LDFLAGS)
+			$(CC) -o $(NAME) $(OBJ) -pthread $(LDFLAGS)
 
 clean:
 			rm -f $(OBJ)
