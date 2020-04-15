@@ -40,4 +40,6 @@ int is_post_method(c_config *config, c_request *req);
 int is_put_method(c_config *config, c_request *req);
 int is_delete_method(c_config *config, c_request *req);
 
+int has_method_implemented(c_config *config, c_request *req);
+
 #endif

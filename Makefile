@@ -35,6 +35,7 @@ SRC 	= 	src/main.c \
 			src/response/content/serve_static_file.c \
 			src/response/content/serve_custom_location.c \
 			src/response/content/not_found.c \
+			src/response/content/not_implemented.c \
 			src/response/httpdd/httpdd.c \
 			src/response/httpdd/is_static_file.c \
 			src/response/httpdd/has_method_implemented.c \
