@@ -39,26 +39,17 @@ void add_response_header(c_response *res, Http_Header *header) {
     }
 }
 
-void free_header(Http_Header *h) {
-    if (h == NULL) {
-        return;
-    }
-    if (h->key != NULL)
-        free(h->key);
-    if (h->value != NULL)
-        free(h->value);
-}
-
 void free_headers(Http_Header *headers) {
     Http_Header *i, *h;
-
+    if (headers == NULL) {
+        return;
+    }
     i = headers;
     while (i != NULL) {
         h = i;
         i = i->next;
-        free_header(h);
+        free(h);
     }
-    free_header(h);
 }
 
 Http_Header *find_header(Http_Header *h, const char *key) {

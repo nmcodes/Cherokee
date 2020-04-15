@@ -59,7 +59,7 @@ int main(void){
 
     server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons(8000);
+    server.sin_port = htons(config->port);
 
     //Bind
     if(bind(skt, (struct sockaddr *)&server, sizeof(server)) < 0)

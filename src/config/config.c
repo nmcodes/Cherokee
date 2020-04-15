@@ -67,7 +67,7 @@ c_config *new_config() {
 }
 
 void default_config(c_config* pconfig) {
-    pconfig->port           = 8080;
+    pconfig->port           = 8000;
     pconfig->loglevel       = "INFO";
     pconfig->logfile        = "/var/log/cherokee_default.log";
     pconfig->root_path      = "/tmp/cherokee/";
