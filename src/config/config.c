@@ -31,7 +31,9 @@ static int handler(void* user, const char* section, const char* name,
         pconfig->headermaxsize = atoi(value);
     } else if (MATCH("config", "backlog")) {
         pconfig->backlog = atoi(value);
-    }  else {
+    } else if (MATCH("config", "customdir")) {
+        pconfig->customdir = strdup(value);
+    } else {
         return 0;  /* unknown section/name, error */
     }
     return 1;
@@ -57,11 +59,11 @@ c_config *new_config() {
 
     if (ini_parse("/tmp/config.ini", handler, config) < 0) {
         log_info("Can't load 'config.ini'");
-        log_info("Config loaded from default: port=%d, loglevel=%s, logfile=%s, rootpath=%s, workers=%d, headermaxsize=%d, backlog=%d",
-        config->port, config->loglevel, config->logfile, config->root_path, config->workers, config->headermaxsize, config->backlog);
+        log_info("Config loaded from default: port=%d, loglevel=%s, logfile=%s, rootpath=%s, workers=%d, headermaxsize=%d, backlog=%d, customdir=%s",
+        config->port, config->loglevel, config->logfile, config->root_path, config->workers, config->headermaxsize, config->backlog, config->customdir);
     } else {
-    log_info("Config loaded from '/tmp/config.ini': port=%d, loglevel=%s, logfile=%s, rootpath=%s, workers=%d, headermaxsize=%d, backlog=%d",
-        config->port, config->loglevel, config->logfile, config->root_path, config->workers, config->headermaxsize, config->backlog);
+    log_info("Config loaded from '/tmp/config.ini': port=%d, loglevel=%s, logfile=%s, rootpath=%s, workers=%d, headermaxsize=%d, backlog=%d, customdir=%s",
+        config->port, config->loglevel, config->logfile, config->root_path, config->workers, config->headermaxsize, config->backlog, config->customdir);
     }
     return config;
 }
@@ -74,5 +76,6 @@ void default_config(c_config* pconfig) {
     pconfig->workers        = 3;
     pconfig->headermaxsize  = 1024;
     pconfig->backlog        = 3;
+    pconfig->customdir      = "/tmp/cherokee-custom";
 }
 

@@ -12,8 +12,13 @@ c_http_decision_diagram d_serve_static_file = { serve_static_file, NULL, NULL };
 c_http_decision_diagram d_not_found = { not_found, NULL, NULL };
 c_http_decision_diagram d_static_file_is_get = { is_get_method, &d_serve_static_file, NULL };
 c_http_decision_diagram d_static_file = { is_static_file, &d_static_file_is_get, &d_not_found };
+
 c_http_decision_diagram d_static_dir = { is_static_directory, NULL, &d_static_file };
-c_http_decision_diagram d_static_location = { is_static_location, &d_static_dir, NULL };
+
+c_http_decision_diagram d_custom_location = { serve_custom_location, NULL, NULL };
+c_http_decision_diagram d_method_implemented = { has_method_implemented, &d_custom_location, NULL };
+
+c_http_decision_diagram d_static_location = { is_static_location, &d_static_dir, &d_method_implemented };
 c_http_decision_diagram *diagram = &d_static_location;
 
 
