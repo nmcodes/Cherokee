@@ -32,12 +32,14 @@ SRC 	= 	src/main.c \
 			src/inih/ini.c \
 			src/response/response.c \
 			src/response/content/serve_static_file.c \
+			src/response/content/serve_custom_location.c \
 			src/response/content/not_found.c \
 			src/response/httpdd/httpdd.c \
 			src/response/httpdd/is_static_file.c \
+			src/response/httpdd/has_method_implemented.c \
 			src/response/httpdd/is_static_directory.c \
 			src/response/httpdd/is_static_location.c \
-			src/response/httpdd/is_get_method.c \
+			src/response/httpdd/is_method.c \
 			src/custom/custom.c \
 			src/custom/call.c \
 

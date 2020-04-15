@@ -75,11 +75,11 @@ void listdir(const char *name, int depth, c_router *r)
     closedir(dir);
 }
 
-c_router *get_router_from_url(char *url) {
+c_router *get_router_from_url(c_config *config, char *url) {
     c_router *r;
 
     if (url == NULL)
-        return NULL
+        return NULL;
 
     r = config->router;
     while (r != NULL) {

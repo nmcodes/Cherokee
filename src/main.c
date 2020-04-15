@@ -37,7 +37,6 @@ int main(void){
     log_set_level(0);
 
     config->router = get_custom_router(config);
-    call_python_module("/tmp/cherokee-custom/users", "get");
 
     signal(SIGINT, sigint_handler);
     log_info("Starting Cherokee");

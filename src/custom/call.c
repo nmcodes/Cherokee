@@ -7,6 +7,8 @@
 */
 
 #include "../log/log.h"
+#include "../response/response.h"
+#include "../utils/strings.h"
 #include "Python.h"
 #include "custom.h"
 
@@ -45,26 +47,26 @@ void call_python_module(c_response *res, char *folder, char *method) {
                 for (long i = 0; i < size; i++) {
                     PyObject *pItem = PyList_GetItem(pHeaders, i);
                     if (pItem) {
-                        log_debug("h[%d] : %s", i, PyUnicode_AsUTF8(pItem));
-                        char *raw_h = PyUnicode_AsUTF8(pItem);
-                        Http_Header h = malloc(sizeof(Http_Header));
+                        char *raw_h = strdup(PyUnicode_AsUTF8(pItem));
+                        log_debug("h[%d] : %s", i, raw_h);
+                        Http_Header *h = malloc(sizeof(Http_Header));
                         h->next = NULL;
                         h->value = trim(strstr(raw_h, ":") + 1);
-                        key = strtok_r(raw_h, ":", &raw_h);
+                        char *key = strtok_r(raw_h, ":", &raw_h);
 
                         for(int i = 0; key[i]; i++){
                             key[i] = tolower(key[i]);
                         }
                         h->key = key;
-
+                        add_response_header(res, h);
                     }
                 }
             }
 
             pBody = PyDict_GetItemString(pValue, "body");
-            req->response->body->content = PyUnicode_AsUTF8(pBody);
-            req->response->body->length = (int) strlen(req->response->body->content);
-            req->response->body->is_binary = 0;
+            res->body->content = PyUnicode_AsUTF8(pBody);
+            res->body->length = (int) strlen(res->body->content);
+            res->body->is_binary = 0;
             Py_DECREF(pValue);
         }
         else {

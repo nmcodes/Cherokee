@@ -1,6 +1,6 @@
 #!/usr/bin/python3.6
 
-def get():
+def post():
     return {
         "headers": [
             "Content-Type: text/plain",

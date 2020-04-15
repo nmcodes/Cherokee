@@ -14,6 +14,7 @@
 #include "../config/config.h"
 
 typedef struct cherokee_config c_config;
+typedef struct cherokee_response c_response;
 
 typedef struct                      cherokee_router {
     char                            *path;
@@ -26,7 +27,7 @@ typedef struct                      cherokee_router {
 
 void test();
 c_router *get_custom_router(c_config *config);
-void call_python_module(char *file, char *method);
-c_router *get_router_from_url(char *url);
+void call_python_module(c_response *res, char *folder, char *method);
+c_router *get_router_from_url(c_config *config, char *url);
 
 #endif

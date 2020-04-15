@@ -16,9 +16,9 @@ int is_static_location(c_config *config, c_request *req) {
         return HTTPDD_TRUE;
     }
 
-    r = get_router_from_url(req->url);
+    r = get_router_from_url(config, req->url);
     if (r != NULL) {
-        return HTTPDD_FALSE
+        return HTTPDD_FALSE;
     }
     return HTTPDD_TRUE;
 }

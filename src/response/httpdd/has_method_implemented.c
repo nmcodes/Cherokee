@@ -14,7 +14,7 @@ int has_method_implemented(c_config *config, c_request *req) {
     if (req->url == NULL)
         return HTTPDD_FALSE;
 
-    r = get_router_from_url(req->url);
+    r = get_router_from_url(config, req->url);
     if (r == NULL)
         return HTTPDD_FALSE;
 
