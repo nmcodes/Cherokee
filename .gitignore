@@ -56,3 +56,6 @@ Cherokee
 
 # log files
 access.log
+
+# IDE
+.vscode/*

@@ -34,7 +34,7 @@ void free_request(c_request *req) {
         free_headers(req->headers);
     }
 
-    free_response(req->response);
+    //free_response(req->response);
     free(req);
 }
 

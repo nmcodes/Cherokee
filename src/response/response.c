@@ -21,6 +21,11 @@ c_response *new_response() {
     response->body->length = -1;
     response->body->is_binary = -1;
 
+    Http_Status s;
+    s.code = 500;
+    s.hint = "Internal Server Error";
+    response->status = s;
+
     return response;
 }
 
@@ -69,6 +74,8 @@ int get_headers_length(c_response *res) {
     headers_length = 0;
     h = res->headers;
     while (h != NULL) {
+        log_debug("GET HEADERS LENGTH FOR H->key: %s", h->key);
+        log_debug("GET HEADERS LENGTH FOR H->value: %s", h->value);
         headers_length += (int) strlen(h->key) + 2 + (int) strlen(h->value) + 1;
         h = h->next;
     }
@@ -122,49 +129,67 @@ int get_response_length(c_response *res, int cmd_line_length, int headers_length
 }
 
 int add_body_to_response(c_response *res, int cmd_line_length, int headers_length) {
-    if (res == NULL || res->body == NULL || res->body->content == NULL || res->raw == NULL)
+    if (res == NULL || res->body == NULL || res->body->content == NULL || res->raw == NULL) {
+        log_debug("NO CONTENT");
         return 0;
+    }
 
+    log_debug("ADD BODY TO RESPONSE, CONTENT : %p", res->body->content);
+    log_debug("CONTENT FROM FILE : %x", res->body->content);
     if (res->body->is_binary == CONTENT_TYPE_BINARY) {
+        log_debug("BINARY CONTENT");
         memcpy(
-            res->raw + cmd_line_length + headers_length + 1,
+            res->raw + cmd_line_length + headers_length - 1,
             res->body->content,
             res->body->length
         );
         return -1;
     } else {
+        log_debug("NOT BINARY CONTENT");
+        log_debug("res->raw : %s", res->raw);
+        log_debug("res->body->content : %s", res->body->content);
         strcat(res->raw, res->body->content);
-        return strlen(res->raw);
+        log_debug("res->raw : %s", res->raw);
+        log_debug("strlen(res->raw) : %d", strlen(res->raw));
+        return (int) strlen(res->raw);
     }
 }
 
-int build_response(c_response *res) {
+int build_response(c_request *req) {
     char *raw_command_line;
     char *raw_headers;
     int command_line_length;
     int headers_length;
     int raw_response_length;
+    int l;
 
-    finish_response(res);
+    finish_response(req->response);
 
-    command_line_length = build_command_line(res, &raw_command_line);
-    headers_length = build_headers(res, &raw_headers);
+    command_line_length = build_command_line(req->response, &raw_command_line);
+    headers_length = build_headers(req->response, &raw_headers);
 
-    raw_response_length = get_response_length(res, command_line_length, headers_length);
-    res->raw = malloc(raw_response_length);
-    memset(res->raw, '\0', raw_response_length);
+    raw_response_length = get_response_length(req->response, command_line_length, headers_length);
+    req->response->raw = malloc(raw_response_length);
+    memset(req->response->raw, '\0', raw_response_length);
 
-    strcat(res->raw, raw_command_line);
-    strcat(res->raw, raw_headers);
-    strcat(res->raw, "\n");
+    strcat(req->response->raw, raw_command_line);
+    strcat(req->response->raw, raw_headers);
+    strcat(req->response->raw, "\n");
 
-    int l = add_body_to_response(res, command_line_length, headers_length);
-    free(raw_command_line);
-    free(raw_headers);
+    if (req->method != HEAD) {
+        log_debug("ADD BODY TO RESPONSE");
+        l = add_body_to_response(req->response, command_line_length, headers_length);
+        log_debug("L : %d", l);
 
-    if (l != -1) {
-        return l;
+        if (l != -1) {
+            return l;
+        }
+    } else {
+        log_debug("HEAD METHOD, DO NOT ADD BODY TO RESPONSE");
     }
+    // free(raw_command_line);
+    // free(raw_headers);
+
     return raw_response_length;
 }
 

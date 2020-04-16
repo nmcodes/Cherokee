@@ -6,6 +6,7 @@
 **
 */
 
+#include "../log/log.h"
 #include "headers.h"
 
 static volatile Content_Type content_types[] = {
@@ -91,16 +92,17 @@ Content_Type get_content_type(char *data_type) {
 
 Http_Header *new_content_type_header(char *data_type) {
     Http_Header *h;
-
+    char *type = strdup(data_type);
 
     h = malloc(sizeof(Http_Header));
     h->next = NULL;
     h->key = strdup("Content-Type");
-    h->value = get_content_type(data_type).value;
+    h->value = get_content_type(type).value;
 
     return h;
 }
 
 int is_binary_content_type(char *data_type) {
-    return get_content_type(data_type).is_binary;
+    char *type = strdup(data_type);
+    return get_content_type(type).is_binary;
 }

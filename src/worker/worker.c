@@ -16,15 +16,14 @@
 #include "worker.h"
 
 
-void worker(int skt)
+void worker(int skt, c_config* config)
 {
     int client_skt;
     char buf[1024];
     c_request *req;
-    c_config *config;
+
 
     log_info("Worker successfuly started.");
-    config = new_config();
 
     while(1) {
         log_info("Worker ready to accept connection");
@@ -42,24 +41,27 @@ void worker(int skt)
             log_error("Unable to read data");
             perror("Client read failed\n");
         }
+        log_debug("GOT REQUEST:\n%s", buf);
 
         req = parse(buf);
 
         resolve_http_decision_diagram(config, req);
-        int res_len = build_response(req->response);
+        log_debug("BUILD RESPONSE");
+        int res_len = build_response(req);
+        log_debug("BUILD RESPONSE DONE");
 
         int err = send(client_skt, req->response->raw, res_len, 0);
         if (err < 0) {
-            perror("Client write failed\n");
-        }
-
-        if (req->body != NULL) {
-            log_info("HTTP/%d.%d %s %s (%d) Sent %d bytes (%d)", req->version.major, req->version.minor, methodToStr(req->method), req->url, strlen(req->body), req->response->status.code);
+            log_error("Client write failed");
         } else {
-            log_info("HTTP/%d.%d %s %s (%d)", req->version.major, req->version.minor, methodToStr(req->method), req->url, req->response->status.code);
+            if (req->body != NULL) {
+                log_info("HTTP/%d.%d %s %s (%d) Sent %d bytes (%d)", req->version.major, req->version.minor, methodToStr(req->method), req->url, strlen(req->body), req->response->status.code);
+            } else {
+                log_info("HTTP/%d.%d %s %s (%d)", req->version.major, req->version.minor, methodToStr(req->method), req->url, req->response->status.code);
+            }
         }
 
-        free_request(req);
+        // free_request(req);
         close(client_skt);
     }
 
@@ -67,7 +69,7 @@ void worker(int skt)
     exit(0);
 }
 
-pid_t spawn_worker(int skt)
+pid_t spawn_worker(int skt, c_config* config)
 {
     pid_t pid = create_process();
 
@@ -77,21 +79,21 @@ pid_t spawn_worker(int skt)
         return -1;
     } else if (pid == 0)
     {
-        worker(skt);
+        worker(skt, config);
     }
 
     return pid;
 }
 
-void spawn_multiple_workers(int nb_workers, pid_t *pids, int skt) {
+void spawn_multiple_workers(pid_t *pids, int skt, c_config* config) {
     int i;
     pid_t pid;
 
-    log_info("Spawning %d workers", nb_workers);
+    log_info("Spawning %d workers", config->workers);
 
-    for (i = 0; i < nb_workers; i++)
+    for (i = 0; i < config->workers; i++)
     {
-        pid = spawn_worker(skt);
+        pid = spawn_worker(skt, config);
         if (pid == 0) {
             break;
         } else {
