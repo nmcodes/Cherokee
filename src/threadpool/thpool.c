@@ -1,13 +1,3 @@
-/* ********************************
- * Author:       Johan Hanssen Seferidis
- * License:	     MIT
- * Description:  Library providing a threading pool where you can add
- *               work. For usage, check the thpool.h file or README.md
- *
- *//** @file thpool.h *//*
- *
- ********************************/
-
 #define _POSIX_C_SOURCE 200809L
 #include <unistd.h>
 #include <signal.h>
@@ -38,11 +28,6 @@ static volatile int threads_keepalive;
 static volatile int threads_on_hold;
 
 
-
-/* ========================== STRUCTURES ============================ */
-
-
-/* Binary semaphore */
 typedef struct bsem {
 	pthread_mutex_t mutex;
 	pthread_cond_t   cond;
@@ -50,47 +35,38 @@ typedef struct bsem {
 } bsem;
 
 
-/* Job */
+
 typedef struct job{
-	struct job*  prev;                   /* pointer to previous job   */
-	void   (*function)(void* arg);       /* function pointer          */
-	void*  arg;                          /* function's argument       */
+	struct job*  prev;
+	void   (*function)(void* arg);      
+	void*  arg;                         
 } job;
 
 
-/* Job queue */
 typedef struct jobqueue{
-	pthread_mutex_t rwmutex;             /* used for queue r/w access */
-	job  *front;                         /* pointer to front of queue */
-	job  *rear;                          /* pointer to rear  of queue */
-	bsem *has_jobs;                      /* flag as binary semaphore  */
-	int   len;                           /* number of jobs in queue   */
+	pthread_mutex_t rwmutex;
+	job  *front;
+	job  *rear;
+	bsem *has_jobs;
+	int   len;                          
 } jobqueue;
 
 
-/* Thread */
+
 typedef struct thread{
-	int       id;                        /* friendly id               */
-	pthread_t pthread;                   /* pointer to actual thread  */
-	struct thpool_* thpool_p;            /* access to thpool          */
+	int       id;
+	pthread_t pthread;
+	struct thpool_* thpool_p;
 } thread;
 
-
-/* Threadpool */
 typedef struct thpool_{
-	thread**   threads;                  /* pointer to threads        */
-	volatile int num_threads_alive;      /* threads currently alive   */
-	volatile int num_threads_working;    /* threads currently working */
-	pthread_mutex_t  thcount_lock;       /* used for thread count etc */
-	pthread_cond_t  threads_all_idle;    /* signal to thpool_wait     */
-	jobqueue  jobqueue;                  /* job queue                 */
+	thread**   threads;
+	volatile int num_threads_alive;
+	volatile int num_threads_working;
+	pthread_mutex_t  thcount_lock;
+	pthread_cond_t  threads_all_idle;
+	jobqueue  jobqueue;
 } thpool_;
-
-
-
-
-
-/* ========================== PROTOTYPES ============================ */
 
 
 static int  thread_init(thpool_* thpool_p, struct thread** thread_p, int id);
@@ -111,13 +87,6 @@ static void  bsem_post_all(struct bsem *bsem_p);
 static void  bsem_wait(struct bsem *bsem_p);
 
 
-
-
-
-/* ========================== THREADPOOL ============================ */
-
-
-/* Initialise thread pool */
 struct thpool_* thpool_init(int num_threads){
 
 	threads_on_hold   = 0;
@@ -127,7 +96,6 @@ struct thpool_* thpool_init(int num_threads){
 		num_threads = 0;
 	}
 
-	/* Make new thread pool */
 	thpool_* thpool_p;
 	thpool_p = (struct thpool_*)malloc(sizeof(struct thpool_));
 	if (thpool_p == NULL){
@@ -137,14 +105,12 @@ struct thpool_* thpool_init(int num_threads){
 	thpool_p->num_threads_alive   = 0;
 	thpool_p->num_threads_working = 0;
 
-	/* Initialise the job queue */
 	if (jobqueue_init(&thpool_p->jobqueue) == -1){
 		err("thpool_init(): Could not allocate memory for job queue\n");
 		free(thpool_p);
 		return NULL;
 	}
 
-	/* Make threads in pool */
 	thpool_p->threads = (struct thread**)malloc(num_threads * sizeof(struct thread *));
 	if (thpool_p->threads == NULL){
 		err("thpool_init(): Could not allocate memory for threads\n");
@@ -156,7 +122,6 @@ struct thpool_* thpool_init(int num_threads){
 	pthread_mutex_init(&(thpool_p->thcount_lock), NULL);
 	pthread_cond_init(&thpool_p->threads_all_idle, NULL);
 
-	/* Thread init */
 	int n;
 	for (n=0; n<num_threads; n++){
 		thread_init(thpool_p, &thpool_p->threads[n], n);
@@ -164,15 +129,11 @@ struct thpool_* thpool_init(int num_threads){
 			printf("THPOOL_DEBUG: Created thread %d in pool \n", n);
 #endif
 	}
-
-	/* Wait for threads to initialize */
 	while (thpool_p->num_threads_alive != num_threads) {}
 
 	return thpool_p;
 }
 
-
-/* Add work to the thread pool */
 int thpool_add_work(thpool_* thpool_p, void (*function_p)(void*), void* arg_p){
 	job* newjob;
 
@@ -181,19 +142,15 @@ int thpool_add_work(thpool_* thpool_p, void (*function_p)(void*), void* arg_p){
 		err("thpool_add_work(): Could not allocate memory for new job\n");
 		return -1;
 	}
-
-	/* add function and argument */
 	newjob->function=function_p;
 	newjob->arg=arg_p;
 
-	/* add job to queue */
 	jobqueue_push(&thpool_p->jobqueue, newjob);
 
 	return 0;
 }
 
 
-/* Wait until all jobs have finished */
 void thpool_wait(thpool_* thpool_p){
 	pthread_mutex_lock(&thpool_p->thcount_lock);
 	while (thpool_p->jobqueue.len || thpool_p->num_threads_working) {
@@ -203,9 +160,7 @@ void thpool_wait(thpool_* thpool_p){
 }
 
 
-/* Destroy the threadpool */
 void thpool_destroy(thpool_* thpool_p){
-	/* No need to destory if it's NULL */
 	if (thpool_p == NULL) return ;
 
 	volatile int threads_total = thpool_p->num_threads_alive;
@@ -241,8 +196,6 @@ void thpool_destroy(thpool_* thpool_p){
 	free(thpool_p);
 }
 
-
-/* Pause all threads in threadpool */
 void thpool_pause(thpool_* thpool_p) {
 	int n;
 	for (n=0; n < thpool_p->num_threads_alive; n++){
@@ -250,12 +203,7 @@ void thpool_pause(thpool_* thpool_p) {
 	}
 }
 
-
-/* Resume all threads in threadpool */
 void thpool_resume(thpool_* thpool_p) {
-    // resuming a single threadpool hasn't been
-    // implemented yet, meanwhile this supresses
-    // the warnings
     (void)thpool_p;
 
 	threads_on_hold = 0;
@@ -266,19 +214,6 @@ int thpool_num_threads_working(thpool_* thpool_p){
 	return thpool_p->num_threads_working;
 }
 
-
-
-
-
-/* ============================ THREAD ============================== */
-
-
-/* Initialize a thread in the thread pool
- *
- * @param thread        address to the pointer of the thread to be created
- * @param id            id to be given to the thread
- * @return 0 on success, -1 otherwise.
- */
 static int thread_init (thpool_* thpool_p, struct thread** thread_p, int id){
 
 	*thread_p = (struct thread*)malloc(sizeof(struct thread));
@@ -305,18 +240,8 @@ static void thread_hold(int sig_id) {
 	}
 }
 
-
-/* What each thread is doing
-*
-* In principle this is an endless loop. The only time this loop gets interuppted is once
-* thpool_destroy() is invoked or the program exits.
-*
-* @param  thread        thread that will run this function
-* @return nothing
-*/
 static void* thread_do(struct thread* thread_p){
 
-	/* Set thread name for profiling and debuging */
 	char thread_name[128] = {0};
 	sprintf(thread_name, "thread-pool-%d", thread_p->id);
 
@@ -389,14 +314,6 @@ static void thread_destroy (thread* thread_p){
 	free(thread_p);
 }
 
-
-
-
-
-/* ============================ JOB QUEUE =========================== */
-
-
-/* Initialize queue */
 static int jobqueue_init(jobqueue* jobqueue_p){
 	jobqueue_p->len = 0;
 	jobqueue_p->front = NULL;
@@ -414,7 +331,6 @@ static int jobqueue_init(jobqueue* jobqueue_p){
 }
 
 
-/* Clear the queue */
 static void jobqueue_clear(jobqueue* jobqueue_p){
 
 	while(jobqueue_p->len){
@@ -429,8 +345,6 @@ static void jobqueue_clear(jobqueue* jobqueue_p){
 }
 
 
-/* Add (allocated) job to queue
- */
 static void jobqueue_push(jobqueue* jobqueue_p, struct job* newjob){
 
 	pthread_mutex_lock(&jobqueue_p->rwmutex);
@@ -454,14 +368,6 @@ static void jobqueue_push(jobqueue* jobqueue_p, struct job* newjob){
 	pthread_mutex_unlock(&jobqueue_p->rwmutex);
 }
 
-
-/* Get first job from queue(removes it from queue)
-<<<<<<< HEAD
- *
- * Notice: Caller MUST hold a mutex
-=======
->>>>>>> da2c0fe45e43ce0937f272c8cd2704bdc0afb490
- */
 static struct job* jobqueue_pull(jobqueue* jobqueue_p){
 
 	pthread_mutex_lock(&jobqueue_p->rwmutex);
@@ -498,13 +404,6 @@ static void jobqueue_destroy(jobqueue* jobqueue_p){
 }
 
 
-
-
-
-/* ======================== SYNCHRONISATION ========================= */
-
-
-/* Init semaphore to 1 or 0 */
 static void bsem_init(bsem *bsem_p, int value) {
 	if (value < 0 || value > 1) {
 		err("bsem_init(): Binary semaphore can take only values 1 or 0");
@@ -516,13 +415,10 @@ static void bsem_init(bsem *bsem_p, int value) {
 }
 
 
-/* Reset semaphore to 0 */
 static void bsem_reset(bsem *bsem_p) {
 	bsem_init(bsem_p, 0);
 }
 
-
-/* Post to at least one thread */
 static void bsem_post(bsem *bsem_p) {
 	pthread_mutex_lock(&bsem_p->mutex);
 	bsem_p->v = 1;
@@ -530,8 +426,6 @@ static void bsem_post(bsem *bsem_p) {
 	pthread_mutex_unlock(&bsem_p->mutex);
 }
 
-
-/* Post to all threads */
 static void bsem_post_all(bsem *bsem_p) {
 	pthread_mutex_lock(&bsem_p->mutex);
 	bsem_p->v = 1;
@@ -539,8 +433,6 @@ static void bsem_post_all(bsem *bsem_p) {
 	pthread_mutex_unlock(&bsem_p->mutex);
 }
 
-
-/* Wait on semaphore until semaphore has value 0 */
 static void bsem_wait(bsem* bsem_p) {
 	pthread_mutex_lock(&bsem_p->mutex);
 	while (bsem_p->v != 1) {
