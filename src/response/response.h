@@ -39,7 +39,7 @@ typedef struct      cherokee_response {
 }                   c_response;
 
 void log_response(c_response *res);
-int build_response(c_response *res);
+int build_response(c_request *req);
 
 c_response *new_response();
 void free_response(c_response *res);

@@ -44,10 +44,14 @@ void worker(int skt, c_config* config)
         log_debug("GOT REQUEST:\n%s", buf);
 
         req = parse(buf);
+        if (req == NULL) {
+            close(client_skt);
+            continue;
+        }
 
         resolve_http_decision_diagram(config, req);
         log_debug("BUILD RESPONSE");
-        int res_len = build_response(req->response);
+        int res_len = build_response(req);
         log_debug("BUILD RESPONSE DONE");
 
         int err = send(client_skt, req->response->raw, res_len, 0);

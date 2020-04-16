@@ -109,6 +109,9 @@ c_request *parse(char *raw_request) {
     // SEPARATING HEADERS FROM BODY
     // GET BODY
     raw_body = strstr(raw_request, delim);
+    if (raw_body == NULL) {
+        return NULL;
+    }
     raw_body[0] = '\0';
     raw_body = raw_body + strlen(delim);
 

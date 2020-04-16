@@ -18,6 +18,10 @@
 #include "../../response/httpdd/httpdd.h"
 
 int serve_static_file(c_config *config, c_request *req);
+int serve_custom_location(c_config *config, c_request *req);
+int html_static_dir(c_config *config, c_request *req);
+
 int not_found(c_config *config, c_request *req);
+int not_implemented(__attribute__((unused)) c_config *config, c_request *req);
 
 #endif

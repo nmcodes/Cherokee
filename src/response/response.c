@@ -155,35 +155,41 @@ int add_body_to_response(c_response *res, int cmd_line_length, int headers_lengt
     }
 }
 
-int build_response(c_response *res) {
+int build_response(c_request *req) {
     char *raw_command_line;
     char *raw_headers;
     int command_line_length;
     int headers_length;
     int raw_response_length;
+    int l;
 
-    finish_response(res);
+    finish_response(req->response);
 
-    command_line_length = build_command_line(res, &raw_command_line);
-    headers_length = build_headers(res, &raw_headers);
+    command_line_length = build_command_line(req->response, &raw_command_line);
+    headers_length = build_headers(req->response, &raw_headers);
 
-    raw_response_length = get_response_length(res, command_line_length, headers_length);
-    res->raw = malloc(raw_response_length);
-    memset(res->raw, '\0', raw_response_length);
+    raw_response_length = get_response_length(req->response, command_line_length, headers_length);
+    req->response->raw = malloc(raw_response_length);
+    memset(req->response->raw, '\0', raw_response_length);
 
-    strcat(res->raw, raw_command_line);
-    strcat(res->raw, raw_headers);
-    strcat(res->raw, "\n");
+    strcat(req->response->raw, raw_command_line);
+    strcat(req->response->raw, raw_headers);
+    strcat(req->response->raw, "\n");
 
-    log_debug("ADD BODY TO RESPONSE");
-    int l = add_body_to_response(res, command_line_length, headers_length);
-    log_debug("L : %d", l);
+    if (req->method != HEAD) {
+        log_debug("ADD BODY TO RESPONSE");
+        l = add_body_to_response(req->response, command_line_length, headers_length);
+        log_debug("L : %d", l);
+
+        if (l != -1) {
+            return l;
+        }
+    } else {
+        log_debug("HEAD METHOD, DO NOT ADD BODY TO RESPONSE");
+    }
     // free(raw_command_line);
     // free(raw_headers);
 
-    if (l != -1) {
-        return l;
-    }
     return raw_response_length;
 }
 

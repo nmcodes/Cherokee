@@ -12,6 +12,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include "../custom/custom.h"
+
+typedef struct cherokee_router c_router;
 
 typedef struct cherokee_config
 {
@@ -21,7 +24,9 @@ typedef struct cherokee_config
     char*   root_path;
     int     workers;
     int     headermaxsize;
-    int     backlog; 
+    int     backlog;
+    char    *customdir;
+    c_router *router;
 } c_config;
 
 c_config *new_config();

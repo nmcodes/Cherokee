@@ -8,6 +8,7 @@
 #include <sys/stat.h>
 
 #include "./httpdd.h"
+#include "../../log/log.h"
 
 int is_static_directory(c_config *config, c_request *req) {
     char *dir_path;
@@ -28,6 +29,18 @@ int is_static_directory(c_config *config, c_request *req) {
     free(dir_path);
 
     if (dir_exist == 0 && S_ISDIR(sb.st_mode)) {
+        log_debug("IS STATIC DIR REQ -> URL :%s", req->url);
+        int len = strlen(req->url);
+        if (req->url[len - 1] != '/') {
+            char *new_url;
+
+            new_url = malloc(len + 1);
+            strcpy(new_url, req->url);
+            strcat(new_url, "/");
+
+            req->url = new_url;
+        }
+        log_debug("IS STATIC DIR REQ -> URL :%s", req->url);
         return HTTPDD_TRUE;
     } else {
         return HTTPDD_FALSE;

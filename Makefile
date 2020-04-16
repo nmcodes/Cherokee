@@ -7,6 +7,12 @@
 
 CC 		= 	gcc
 
+LDLIBS  =   -lpython3.6
+
+CFLAGS  =   -Wall -Werror -g -I/usr/include/python3.6m -L/usr/include/python3.6m
+
+PLIB:=$(shell /usr/bin/python3-config --ldflags) #--cflags
+
 SRC 	= 	src/main.c \
 			src/log/log.c \
 			src/worker/worker.c \
@@ -14,6 +20,7 @@ SRC 	= 	src/main.c \
 			src/utils/method.c \
 			src/utils/strings.c \
 			src/utils/file.c \
+			src/utils/dir.c \
 			src/parser/parser.c \
 			src/headers/headers.c \
 			src/headers/content_length.c \
@@ -27,25 +34,27 @@ SRC 	= 	src/main.c \
 			src/threadpool/thpool.c \
 			src/response/response.c \
 			src/response/content/serve_static_file.c \
+			src/response/content/html_static_dir.c \
+			src/response/content/serve_custom_location.c \
 			src/response/content/not_found.c \
+			src/response/content/not_implemented.c \
 			src/response/httpdd/httpdd.c \
 			src/response/httpdd/is_static_file.c \
+			src/response/httpdd/has_method_implemented.c \
 			src/response/httpdd/is_static_directory.c \
 			src/response/httpdd/is_static_location.c \
-			src/response/httpdd/is_get_method.c \
+			src/response/httpdd/is_method.c \
+			src/custom/custom.c \
+			src/custom/call.c \
 
 NAME	=	Cherokee
 
 OBJ		=	$(SRC:.c=.o)
 
-CFLAGS	+=	-W -Wall -Werror -g3
-
-LDFLAGS	=
-
 all: 		$(NAME)
 
 $(NAME):	$(OBJ)
-			$(CC) -o $(NAME) $(OBJ) -pthread $(LDFLAGS)
+			$(CC) -o $(NAME) $(OBJ) -pthread $(LDFLAGS) $(PLIB)
 
 clean:
 			rm -f $(OBJ)
