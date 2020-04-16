@@ -33,11 +33,11 @@ typedef struct Hash
 
 QNode* newQNode( unsigned pageNumber );
 Queue* createQueue( int numberOfFrames );
-Hash* createHash( int capacity )
-int AreAllFramesFull( Queue* queue )
-int isQueueEmpty( Queue* queue )
-void deQueue( Queue* queue )
-void Enqueue( Queue* queue, Hash* hash, unsigned pageNumber )
-void ReferencePage( Queue* queue, Hash* hash, unsigned pageNumber )
+Hash* createHash( int capacity );
+int AreAllFramesFull( Queue* queue );
+int isQueueEmpty( Queue* queue );
+void deQueue( Queue* queue );
+void Enqueue( Queue* queue, Hash* hash, unsigned pageNumber );
+void ReferencePage( Queue* queue, Hash* hash, unsigned pageNumber );
 
 #endif
