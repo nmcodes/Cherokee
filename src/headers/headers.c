@@ -58,3 +58,10 @@ Http_Header *find_header(Http_Header *h, const char *key) {
     while (h->next != NULL && strcmp(h->key, key) != 0) {
         h = h->next;
     }
+
+    if (strcmp(h->key, key) == 0)
+        return h;
+
+    return NULL;
+}
+
