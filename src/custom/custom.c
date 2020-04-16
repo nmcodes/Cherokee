@@ -79,8 +79,10 @@ void listdir(const char *name, int depth, c_router *r)
 void log_router(c_router *r) {
     c_router *i;
 
-    if (r == NULL || r->path == NULL)
+    if (r == NULL || r->path == NULL) {
         log_info("No custom router found");
+        return ;
+    }
 
     log_info("Custom router configuration : ");
     i = r;
