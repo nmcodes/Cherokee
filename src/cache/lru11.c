@@ -7,25 +7,6 @@
 */
 
 #include "lru11.h"
-
-typedef struct QNode
-{
-    struct QNode *prev, *next;
-    unsigned pageNumber;  
-} QNode;
- 
-typedef struct Queue
-{
-    unsigned count;  
-    unsigned numberOfFrames; 
-    QNode *front, *rear;
-} Queue;
- 
-typedef struct Hash
-{
-    int capacity; 
-    QNode* *array;
-} Hash;
  
 QNode* newQNode( unsigned pageNumber )
 {
@@ -109,7 +90,6 @@ void Enqueue( Queue* queue, Hash* hash, unsigned pageNumber )
     }
  
     hash->array[ pageNumber ] = temp;
- 
  
     queue->count++;
 }
