@@ -14,6 +14,7 @@ int html_static_dir(c_config *config, c_request *req) {
     c_dir *dir;
     c_dir_entry *entry;
 
+
     if (strlen(req->url) <= 1) {
         dir_name = strdup(config->root_path);
     } else {
@@ -23,23 +24,28 @@ int html_static_dir(c_config *config, c_request *req) {
     }
     dir = get_dir(dir_name);
 
-    html = malloc(500 * sizeof(char));
+    html = malloc(600 * sizeof(char));
     strcpy(html, "<!DOCTYPE html><html><head><title>");
+    log_debug("HTML : %s", html);
     if (strlen(req->url) > 1) {
         html = realloc(html, strlen(html) + strlen(req->url));
         strcat(html, req->url + 1);
+        log_debug("HTML : %s", html);
     } else {
         html = realloc(html, strlen(html) + strlen(req->url) + 1);
         strcat(html, req->url);
+        log_debug("HTML : %s", html);
     }
-
     html = realloc(html, strlen(html) + 36);
     strcat(html, "</title></head><body><h1>Directory ");
+    log_debug("HTML : %s", html);
     html = realloc(html, strlen(html) + strlen(req->url) + 1);
     strcat(html, req->url);
+    log_debug("HTML : %s", html);
 
     html = realloc(html, strlen(html) + 10);
     strcat(html, "</h1><ul>");
+    log_debug("HTML : %s", html);
 
     entry = dir->entries;
     while (entry != NULL) {
@@ -47,29 +53,45 @@ int html_static_dir(c_config *config, c_request *req) {
         strcat(html, "<li><a href='");
 
         if (strcmp(entry->name, ".") == 0) {
+            log_debug("HTML : %s", html);
             html = realloc(html, strlen(html) + strlen(req->url) + 1);
             strcat(html, req->url);
+            log_debug("HTML : %s", html);
         } else if (strcmp(entry->name, "..") == 0) {
             // TODO : FIX
-            char *token, *last_token = NULL, *rest = req->url;
-            while ((token = strtok_r(rest, "/", &rest))) {
-                log_debug("%s", token);
-                last_token = token;
+            char *current_dir = strdup(req->url);
+            if (current_dir[strlen(current_dir)-1] == '/') {
+                current_dir[strlen(current_dir)-1] = 0;
             }
-            log_debug("rest : %s", rest);
-            log_debug("last token : %s", last_token);
+            char *lastSlash = strrchr(current_dir, '/');
+            if (lastSlash == NULL) {
+                current_dir = strdup(req->url);
+            } else if (*lastSlash != 0) {
+                *(lastSlash +1) = 0;
+            }
+            html = realloc(html, strlen(html) + strlen(current_dir) + 1);
+            strcat(html, strdup(current_dir));
+            log_debug("HTML : %s", html);
         } else {
-            html = realloc(html, strlen(html) + strlen(req->url) + strlen(entry->name) + 1);
+            html = realloc(html, strlen(html) + strlen(req->url) + 2 + strlen(entry->name) + 2);
             strcat(html, req->url);
+            log_debug("HTML : %s", html);
+            if (req->url[strlen(req->url) -1] != '/') {
+                strcat(html, "/");
+                log_debug("HTML : %s", html);
+            }
             strcat(html, entry->name);
+            log_debug("HTML : %s", html);
         }
 
         html = realloc(html, strlen(html) + 3);
         strcat(html, "'>");
+        log_debug("HTML : %s", html);
 
-        html = realloc(html, strlen(html) + strlen(entry->name) + 10);
+        html = realloc(html, strlen(html) + strlen(entry->name) + 11);
         strcat(html, entry->name);
         strcat(html, "</a></li>");
+        log_debug("HTML : %s", html);
 
         entry = entry->next;
     }
