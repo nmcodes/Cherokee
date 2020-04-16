@@ -25,7 +25,7 @@ typedef struct                      cherokee_router {
     struct cherokee_router          *next;
 }                                   c_router;
 
-void test();
+void log_router(c_router *r);
 c_router *get_custom_router(c_config *config);
 void call_python_module(c_response *res, char *folder, char *method);
 c_router *get_router_from_url(c_config *config, char *url);

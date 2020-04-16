@@ -28,20 +28,16 @@ void sigint_handler(__attribute__((unused)) int i) {
 
 int main(void){
     struct sockaddr_in server;
-<<<<<<< HEAD
-    int nb_workers = 1;
-    pid_t *pids = malloc(nb_workers * sizeof(pid_t));
-=======
     // int nb_workers = 4;
     // pid_t *pids = malloc(nb_workers * sizeof(pid_t));
     c_config *config;
->>>>>>> edabd87ad8d559e490c70bd4306b9dcf9178e58f
 
     config = new_config();
     log_set_fp(fopen("access.log", "a+"));
     log_set_level(0);
 
     config->router = get_custom_router(config);
+    log_router(config->router);
 
     signal(SIGINT, sigint_handler);
     log_info("Starting Cherokee");
@@ -66,7 +62,7 @@ int main(void){
     }
 
 
-    server.sin_family = AF_INET; 
+    server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_port = htons(config->port);
 
@@ -83,18 +79,9 @@ int main(void){
     worker(skt, config);
     // spawn_multiple_workers(pids, skt, config);
 
-<<<<<<< HEAD
-    int i;
-    for (i = 0; i < nb_workers; i++) {
-        waitpid(pids[i], NULL, 0);
-    }
-
-    free(pids);
-=======
     // int i;
     // for (i = 0; i < nb_workers; i++) {
     //     waitpid(pids[i], NULL, 0);
     // }
->>>>>>> edabd87ad8d559e490c70bd4306b9dcf9178e58f
     log_info("Closing Cherokee");
 }
