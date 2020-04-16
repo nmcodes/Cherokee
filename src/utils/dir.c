@@ -28,7 +28,7 @@ c_dir *get_dir(char *path) {
         // } else {
             c_dir_entry *centry;
             centry = malloc(sizeof(c_dir_entry));
-            centry->name = entry->d_name;
+            centry->name = strdup(entry->d_name);
             centry->next = NULL;
 
             if (cdir->entries == NULL) {
