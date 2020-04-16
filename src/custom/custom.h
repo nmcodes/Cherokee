@@ -10,7 +10,7 @@
 #define __CUSTOM_H__
 
 #define PY_SSIZE_T_CLEAN
-#include "Python.h"
+#include <Python/Python.h>
 #include "../config/config.h"
 
 typedef struct cherokee_config c_config;

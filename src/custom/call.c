@@ -9,7 +9,7 @@
 #include "../log/log.h"
 #include "../response/response.h"
 #include "../utils/strings.h"
-#include "Python.h"
+#include <Python/Python.h>
 #include "custom.h"
 
 void call_python_module(c_response *res, char *folder, char *method) {

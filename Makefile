@@ -9,7 +9,8 @@ CC 		= 	gcc
 
 LDLIBS  =   -lpython3.6
 
-CFLAGS  =   -Wall -Werror -g -I/usr/include/python3.6m -L/usr/include/python3.6m
+#CFLAGS  =   -Wall -Werror -g -I/usr/include/python3.6m -L/usr/include/python3.6m
+CFLAGS  =   -Wall -Werror -g -I/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7
 
 PLIB:=$(shell /usr/bin/python3-config --ldflags) #--cflags
 
