@@ -39,6 +39,7 @@ void add_response_header(c_response *res, Http_Header *header) {
     }
 }
 
+<<<<<<< HEAD
 void free_header(Http_Header *h) {
     if (h == NULL) {
         return;
@@ -52,13 +53,25 @@ void free_header(Http_Header *h) {
 void free_headers(Http_Header *headers) {
     Http_Header *i, *h;
 
+=======
+void free_headers(Http_Header *headers) {
+    Http_Header *i, *h;
+    if (headers == NULL) {
+        return;
+    }
+>>>>>>> edabd87ad8d559e490c70bd4306b9dcf9178e58f
     i = headers;
     while (i != NULL) {
         h = i;
         i = i->next;
+<<<<<<< HEAD
         free_header(h);
     }
     free_header(h);
+=======
+        free(h);
+    }
+>>>>>>> edabd87ad8d559e490c70bd4306b9dcf9178e58f
 }
 
 Http_Header *find_header(Http_Header *h, const char *key) {
