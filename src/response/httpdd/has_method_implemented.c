@@ -32,6 +32,11 @@ int has_method_implemented(c_config *config, c_request *req) {
         case DELETE:
             implemented = r->has_delete;
             break;
+        case OPTIONS:
+        case HEAD:
+        case NONE:
+            implemented = 0;
+            break;
     }
 
     if (implemented) {

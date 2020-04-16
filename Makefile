@@ -9,7 +9,7 @@ CC 		= 	gcc
 
 LDLIBS  =   -lpython3.6
 
-CFLAGS  =    -g -I/usr/include/python3.6m -L/usr/include/python3.6m
+CFLAGS  =   -Wall -Werror -g -I/usr/include/python3.6m -L/usr/include/python3.6m
 
 PLIB:=$(shell /usr/bin/python3-config --ldflags) #--cflags
 
@@ -20,6 +20,7 @@ SRC 	= 	src/main.c \
 			src/utils/method.c \
 			src/utils/strings.c \
 			src/utils/file.c \
+			src/utils/dir.c \
 			src/parser/parser.c \
 			src/headers/headers.c \
 			src/headers/content_length.c \
@@ -33,6 +34,7 @@ SRC 	= 	src/main.c \
 			src/threadpool/thpool.c \
 			src/response/response.c \
 			src/response/content/serve_static_file.c \
+			src/response/content/html_static_dir.c \
 			src/response/content/serve_custom_location.c \
 			src/response/content/not_found.c \
 			src/response/content/not_implemented.c \

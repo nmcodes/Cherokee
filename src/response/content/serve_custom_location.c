@@ -37,6 +37,13 @@ int serve_custom_location(c_config *config, c_request *req) {
         case DELETE:
             method = "delete";
             break;
+        case OPTIONS:
+        case HEAD:
+        case NONE:
+            method = NULL;
+    }
+    if (method == NULL) {
+        return HTTPDD_END;
     }
     log_debug("method : %s", method);
 
