@@ -7,6 +7,7 @@
 */
 
 #include "custom.h"
+#include "../log/log.h"
 #include <dirent.h>
 #include <stdio.h>
 #include <unistd.h>
@@ -75,6 +76,42 @@ void listdir(const char *name, int depth, c_router *r)
     closedir(dir);
 }
 
+void log_router(c_router *r) {
+    c_router *i;
+
+    if (r == NULL || r->path == NULL)
+        log_info("No custom router found");
+
+    log_info("Custom router configuration : ");
+    i = r;
+    while (i != NULL) {
+        char *log_r;
+        log_r = malloc(strlen(r->path) + 26 ); // r->path (GET, POST, PUT, DELETE)
+        strcpy(log_r, r->path);
+        strcat(log_r, " (");
+        if (!i->has_get && !i->has_post && !i->has_put && !i->has_delete) {
+            strcat(log_r, "NONE");
+        } else {
+            if (i->has_get)
+                strcat(log_r, "GET ");
+            if (i->has_post)
+                strcat(log_r, "POST ");
+            if (i->has_put)
+                strcat(log_r, "PUT ");
+            if (i->has_delete)
+                strcat(log_r, "DELETE");
+        }
+        if (log_r[strlen(log_r)-1] == ' ') {
+            log_r[strlen(log_r)-1] = ')';
+        } else {
+            strcat(log_r, ")");
+        }
+
+        log_info("%s", log_r);
+        i = i->next;
+    }
+}
+
 c_router *get_router_from_url(c_config *config, char *url) {
     c_router *r;
 
@@ -82,7 +119,7 @@ c_router *get_router_from_url(c_config *config, char *url) {
         return NULL;
 
     r = config->router;
-    while (r != NULL) {
+    while (r != NULL && r->path != NULL) {
         if (strcmp(url, r->path) == 0) {
             return r;
         }
@@ -97,11 +134,5 @@ c_router *get_custom_router(c_config *config) {
 
     listdir(config->customdir, 1, r);
 
-    printf("r->path : %s\n", r->path);
-    printf("r->has_get : %d\n", r->has_get);
-    printf("r->has_post : %d\n", r->has_post);
-    printf("r->next->path : %s\n", r->next->path);
-    printf("r->has_get : %d\n", r->next->has_get);
-    printf("r->has_post : %d\n", r->next->has_post);
     return r;
 }

@@ -37,6 +37,7 @@ int main(void){
     log_set_level(0);
 
     config->router = get_custom_router(config);
+    log_router(config->router);
 
     signal(SIGINT, sigint_handler);
     log_info("Starting Cherokee");
@@ -61,7 +62,7 @@ int main(void){
     }
 
 
-    server.sin_family = AF_INET; 
+    server.sin_family = AF_INET;
     server.sin_addr.s_addr = INADDR_ANY;
     server.sin_port = htons(config->port);
 
