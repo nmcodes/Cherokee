@@ -8,7 +8,7 @@
 
 #include "lru11.h"
  
-QNode* newQNode( unsigned pageNumber )
+QNode* newQNode( unsigned int pageNumber )
 {
     QNode* temp = (QNode *)malloc( sizeof( QNode ) );
     temp->pageNumber = pageNumber;
@@ -69,7 +69,7 @@ void deQueue( Queue* queue )
     queue->count--;
 }
  
-void Enqueue( Queue* queue, Hash* hash, unsigned pageNumber )
+void Enqueue( Queue* queue, Hash* hash, unsigned int pageNumber )
 {
 
     if ( AreAllFramesFull ( queue ) )
@@ -96,7 +96,7 @@ void Enqueue( Queue* queue, Hash* hash, unsigned pageNumber )
 }
  
 
-void ReferencePage( Queue* queue, Hash* hash, unsigned pageNumber )
+void ReferencePage( Queue* queue, Hash* hash, unsigned int pageNumber )
 {
     QNode* reqPage = hash->array[ pageNumber ];
  
@@ -131,13 +131,12 @@ int main(int argc, char *argv[])
     ReferencePage( q, hash, 3);
     ReferencePage( q, hash, 4);
     ReferencePage( q, hash, 4);
-    ReferencePage( q, hash, 5);
     ReferencePage( q, hash, 4);
-    ReferencePage( q, hash, 4);
+    // ReferencePage( q, hash, ftok("lru11.c", 'R'));
     printf ("%d ", q->front->pageNumber);
     printf ("%d ", q->front->next->pageNumber);
     printf ("%d ", q->front->next->next->pageNumber);
-    printf ("%d ", q->front->next->next->next->pageNumber);
+    // printf ("%d ", q->front->next->next->next->pageNumber);
 
     if (argc > 2) {
         fprintf(stderr, "usage: shmdemo [data_to_write]\n");

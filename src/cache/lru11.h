@@ -21,7 +21,7 @@
 typedef struct QNode
 {
     struct QNode *prev, *next;
-    unsigned pageNumber;  
+    unsigned int pageNumber;  
 } QNode;
  
 typedef struct Queue
@@ -42,13 +42,13 @@ int shmid;
 char *data;
 int mode;
 
-QNode* newQNode( unsigned pageNumber );
+QNode* newQNode( unsigned int pageNumber );
 Queue* createQueue( int numberOfFrames );
 Hash* createHash( int capacity );
 int AreAllFramesFull( Queue* queue );
 int isQueueEmpty( Queue* queue );
 void deQueue( Queue* queue );
-void Enqueue( Queue* queue, Hash* hash, unsigned pageNumber );
-void ReferencePage( Queue* queue, Hash* hash, unsigned pageNumber );
+void Enqueue( Queue* queue, Hash* hash, unsigned int pageNumber );
+void ReferencePage( Queue* queue, Hash* hash, unsigned int pageNumber );
 
 #endif
