@@ -11,6 +11,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include <sys/types.h>
+#include <sys/ipc.h>
+#include <sys/shm.h>
+
+#define SHM_SIZE 1024
 
 typedef struct QNode
 {
@@ -30,6 +36,11 @@ typedef struct Hash
     int capacity; 
     QNode* *array;
 } Hash;
+
+key_t key;
+int shmid;
+char *data;
+int mode;
 
 QNode* newQNode( unsigned pageNumber );
 Queue* createQueue( int numberOfFrames );
